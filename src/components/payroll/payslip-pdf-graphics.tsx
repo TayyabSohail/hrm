@@ -95,20 +95,10 @@ export function ContactIcon({ kind }: { kind: PayslipContactKind }) {
     );
   }
 
-  if (kind === 'phone') {
-    return (
-      <Svg width={s} height={s} viewBox='0 0 24 24' style={styles.footerIcon}>
-        <Circle cx='12' cy='12' r='11' fill={c.ink} />
-        <Path d={contactIconPaths.phone} fill={c.white} />
-      </Svg>
-    );
-  }
-
   return (
     <Svg width={s} height={s} viewBox='0 0 24 24' style={styles.footerIcon}>
       <Circle cx='12' cy='12' r='11' fill={c.ink} />
-      <Path d={contactIconPaths.pin} fill={c.white} />
-      <Circle cx='12' cy='10' r='1.7' fill={c.ink} />
+      <Path d={contactIconPaths.phone} fill={c.white} />
     </Svg>
   );
 }

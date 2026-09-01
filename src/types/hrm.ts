@@ -215,7 +215,7 @@ export type PayslipLineItem = {
 
 export type PayslipLogoVariant = 'default' | 'light' | 'watermark';
 
-export type PayslipContactKind = 'site' | 'phone' | 'pin';
+export type PayslipContactKind = 'site' | 'phone';
 
 export type PayrollCycle = {
   id: string;

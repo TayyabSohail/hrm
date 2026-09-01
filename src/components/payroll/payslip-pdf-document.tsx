@@ -181,10 +181,6 @@ export function PayslipPdfDocument({ payslip }: PayslipPdfDocumentProps) {
               <ContactIcon kind='phone' />
               <Text style={styles.footerText}>{contact.phone}</Text>
             </View>
-            <View style={styles.footerItem}>
-              <ContactIcon kind='pin' />
-              <Text style={styles.footerText}>{contact.address}</Text>
-            </View>
           </View>
           <BottomBar />
         </View>
