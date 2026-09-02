@@ -180,13 +180,18 @@ export const payslipPdfStyles = StyleSheet.create({
   },
   footerInner: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: m.pageX,
     paddingTop: 11,
     paddingBottom: 11,
   },
-  footerItem: { flexDirection: 'row', alignItems: 'center', maxWidth: 185 },
+  footerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    maxWidth: 185,
+    marginHorizontal: 22,
+  },
   footerIcon: { marginRight: 8 },
   footerText: { fontSize: 9, color: c.textStrong, lineHeight: 1.3 },
 

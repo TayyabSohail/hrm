@@ -21,6 +21,8 @@ export type { ApprovalKind };
 export type ApprovalItem = {
   id: string;
   kind: ApprovalKind;
+  /** Needed to resolve the employee's profile photo in the queue. */
+  employeeId: string;
   employeeName: string;
   title: string;
   summary: string;
@@ -40,6 +42,7 @@ export function leaveToItem(request: LeaveRequest): ApprovalItem {
   return {
     id: request.id,
     kind: 'leave',
+    employeeId: request.employeeId,
     employeeName: request.employeeName,
     title: leaveTypeLabels[request.type],
     summary: `${request.days} day(s) from ${formatDate(request.startDate)}`,
@@ -60,6 +63,7 @@ export function medicalToItem(claim: MedicalClaim): ApprovalItem {
   return {
     id: claim.id,
     kind: 'medical',
+    employeeId: claim.employeeId,
     employeeName: claim.employeeName,
     title: `Medical · ${medicalServiceTypeLabels[claim.serviceType]}`,
     summary: `${formatCurrency(claim.amount)} · ${medicalClaimForLabels[claim.claimFor]}`,
@@ -85,6 +89,7 @@ export function overtimeToItem(log: OvertimeLog): ApprovalItem {
   return {
     id: log.id,
     kind: 'overtime',
+    employeeId: log.employeeId,
     employeeName: log.employeeName,
     title: `Overtime · ${log.hours}h`,
     summary: `${formatDate(log.date)} · ${log.project}`,
@@ -109,6 +114,7 @@ export function fallbackToItem(row: PendingApproval): ApprovalItem {
   return {
     id: row.item_id,
     kind: row.kind,
+    employeeId: row.employee_id,
     employeeName: row.employee_name,
     title: approvalKindLabels[row.kind],
     summary:

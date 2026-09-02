@@ -140,9 +140,7 @@ export function EmployeeBalances() {
     leaveBalance && leaveBalance.poolTotal > 0
       ? Math.min(100, (leaveBalance.used / leaveBalance.poolTotal) * 100)
       : 0;
-  // Headline is what's claimable right now (accrued − approved claims,
-  // floored by the RPC) — the same figure the /medical page shows. Accrued
-  // alone ignores everything already reimbursed.
+  // Use `available`, not `accrued` — accrued is a lifetime total and can exceed the cap.
   const medicalProgress =
     medicalBalance && medicalBalance.cap > 0
       ? Math.min(100, (medicalBalance.available / medicalBalance.cap) * 100)
@@ -173,10 +171,10 @@ export function EmployeeBalances() {
         title='Medical Allowance'
         icon={HeartPulse}
         value={formatCurrency(medicalBalance.available) || '0'}
-        secondary={`available of ${formatCurrency(medicalBalance.cap)} cap`}
+        secondary={`of ${formatCurrency(medicalBalance.cap)} cap`}
         progress={medicalProgress}
         progressLabel={`${formatCurrency(medicalBalance.available)} available of ${formatCurrency(medicalBalance.cap)}`}
-        footer={`${formatCurrency(medicalBalance.spent) || '0'} used · ${formatCurrency(medicalBalance.monthlyAccrual)}/month`}
+        footer={`${formatCurrency(medicalBalance.spent)} claimed to date · ${formatCurrency(medicalBalance.monthlyAccrual)}/month accrual`}
       />
       <Link
         href={paths.employee.payslips}

@@ -290,10 +290,6 @@ export function PolicyPdfDocument({ policy, version }: PolicyPdfDocumentProps) {
               <ContactIcon kind='phone' />
               <Text style={payslipStyles.footerText}>{contact.phone}</Text>
             </View>
-            <View style={payslipStyles.footerItem}>
-              <ContactIcon kind='pin' />
-              <Text style={payslipStyles.footerText}>{contact.address}</Text>
-            </View>
           </View>
           <BottomBar />
         </View>

@@ -13,7 +13,7 @@ import {
   acknowledgePolicySchema,
   createPolicySchema,
   deletePolicySchema,
-  DUPLICATE_CATEGORY_MESSAGE,
+  DUPLICATE_TITLE_MESSAGE,
   publishPolicyVersionSchema,
 } from '@/schema/policy';
 import { markReviewedSchema } from '@/schema/policy-linkage';
@@ -33,10 +33,10 @@ export const createPolicy = authActionClient
       p_body_html: sanitizeHtml(parsedInput.contentHtml),
     });
     if (error) {
-      // Unique(category) — two admins opened the sheet at the same time.
+      // 23505 is the title-derived `slug`, not the category — categories may repeat.
       if (error.code === '23505') {
         returnValidationErrors(createPolicySchema, {
-          category: { _errors: [DUPLICATE_CATEGORY_MESSAGE] },
+          title: { _errors: [DUPLICATE_TITLE_MESSAGE] },
         });
       }
       throw new Error(error.message);
