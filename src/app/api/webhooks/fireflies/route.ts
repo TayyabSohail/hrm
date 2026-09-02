@@ -18,30 +18,6 @@ import { appConfig } from '@/config/app';
 
 import type { Json } from '@/types/supabase';
 
-/**
- * Fireflies webhook receiver.
- *
- * The webhook URL is configured account-wide in Fireflies Developer Settings,
- * so EVERY meeting on the connected account arrives here — including private
- * calls this app never requested. Those must leak nothing.
- *
- * How that is guaranteed:
- *
- *   1. Signature is verified first. Unsigned or mis-signed requests never reach
- *      any Fireflies API call.
- *   2. Only the meeting TITLE is fetched. If it carries no token of ours, we
- *      stop — no transcript, no summary, no media URLs are ever requested for a
- *      meeting we did not start.
- *   3. Only then is full detail fetched and stored, and only the people named
- *      on the share list before the call get told.
- *
- * Unrecognised meetings return 200, not 404: a non-2xx makes Fireflies retry,
- * which would turn every unrelated meeting into a permanent retry loop.
- *
- * The real payload is `{ event, timestamp, meeting_id }` — snake_case, and not
- * what the public docs describe (`eventType` / `meetingId` / `clientReferenceId`).
- * Confirmed from a live test event on 2026-08-09.
- */
 
 type FirefliesWebhookPayload = {
   event?: string;
@@ -49,8 +25,6 @@ type FirefliesWebhookPayload = {
   meeting_id?: string;
 };
 
-/** Timing-safe compare tolerant of unequal lengths — `timingSafeEqual` throws
- *  on a length mismatch, and that throw is itself an oracle. */
 function signaturesMatch(expected: string, received: string) {
   const a = Buffer.from(expected, 'utf8');
   const b = Buffer.from(received, 'utf8');
@@ -58,9 +32,6 @@ function signaturesMatch(expected: string, received: string) {
   return crypto.timingSafeEqual(a, b);
 }
 
-/** Fireflies' own connectivity ping. It carries a synthetic meeting id
- *  (`test_00000000`) that resolves to nothing, so it is acknowledged and
- *  dropped before any lookup. */
 const TEST_EVENT = 'test';
 
 export async function POST(request: Request) {
@@ -254,8 +225,6 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true, handled: event });
 }
 
-/** Confirms the tunnel reaches this route without needing a signed event.
- *  Reports whether the secret is loaded, never what it is. */
 export async function GET() {
   return NextResponse.json({
     ok: true,

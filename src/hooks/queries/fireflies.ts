@@ -20,12 +20,6 @@ export type NotetakerMeeting = {
   sharedWith: { id: string; fullName: string | null }[];
 };
 
-/**
- * Meetings the signed-in employee may see: ones they summoned, plus ones they
- * were put on the share list for. That split is enforced by RLS
- * (`fireflies_meetings_select_own_or_shared`), not here — this query simply
- * asks for everything and the database returns only what is permitted.
- */
 const fetchMeetings = authQuery(async ({ supabase }) => {
   const { data, error } = await supabase
     .from('fireflies_meetings')
@@ -69,8 +63,6 @@ const fetchMeetings = authQuery(async ({ supabase }) => {
   });
 });
 
-/** History for the notetaker widget. Polls while anything is still in flight so
- *  a bot joining or a transcript landing appears without a manual refresh. */
 export const useNotetakerMeetings = () =>
   useQuery({
     queryKey: [QueryKeys.NOTETAKER_MEETINGS],

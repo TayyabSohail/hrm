@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-/** Only the two languages the team actually meets in. Fireflies takes a short
- *  code (max 5 chars) and falls back to English if omitted. */
 export const FIREFLIES_LANGUAGES = [
   { value: 'en', label: 'English' },
   { value: 'ur', label: 'Urdu' },
@@ -26,8 +24,6 @@ export const summonNotetakerSchema = z.object({
     .min(1, 'Give the meeting a title')
     .max(200, 'Keep the title under 200 characters'),
   language: firefliesLanguageSchema,
-  /** Who may see the recording afterwards. Chosen before the call starts, and
-   *  never widened later — that is the whole access model. */
   shareWith: z.array(z.string().uuid()).default([]),
 });
 

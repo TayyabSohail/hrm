@@ -26,15 +26,6 @@ const isReservedEmail = (email: string) =>
     email.trim().split('@').at(-1)?.toLowerCase() ?? '',
   );
 
-/**
- * Tell someone a recording they were given access to is ready.
- *
- * Deliberately links back to this app rather than to Fireflies: recipients have
- * no Fireflies seat, `transcript_url` would show them a login wall, and the
- * media URLs are CloudFront signed URLs that 403 for everyone. The transcript
- * and summary live in our database and are gated by RLS, so a forwarded email
- * grants nothing on its own.
- */
 export async function sendRecordingReadyEmail({
   to,
   fullName,

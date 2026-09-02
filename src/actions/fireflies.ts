@@ -14,21 +14,6 @@ import Logger from '@/utils/logger';
 
 import { RATE_LIMIT_MESSAGE, summonNotetakerSchema } from '@/schema/fireflies';
 
-/**
- * Send the Fireflies notetaker into a live call.
- *
- * Order matters here. The row and its share list are written BEFORE Fireflies
- * is called, because the correlation token has to exist in our database before
- * a webhook could possibly reference it — the bot can join and the meeting can
- * end faster than a slow API round-trip returns.
- *
- * If `addToLive` then fails, the row is marked `failed` rather than deleted:
- * a rate-limited attempt is worth seeing in history, and deleting would orphan
- * the token if the request actually did land.
- *
- * Available to every signed-in employee, not just admins. Access to the
- * resulting recording is governed entirely by the share list chosen here.
- */
 export const summonNotetaker = authActionClient
   .schema(summonNotetakerSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {

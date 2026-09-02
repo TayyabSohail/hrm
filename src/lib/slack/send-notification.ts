@@ -2,17 +2,6 @@ import 'server-only';
 
 import Logger from '@/utils/logger';
 
-/**
- * Post to a Slack incoming webhook.
- *
- * Best-effort by design and never thrown from. A Slack outage must not stop
- * someone summoning a notetaker, and must not stop a finished recording
- * reaching the people it was promised to — the same posture policy emails
- * already take. Failures are logged and dropped.
- *
- * Silently a no-op when SLACK_WEBHOOK_URL is unset, so the feature works
- * end-to-end before Slack is wired up.
- */
 export async function sendSlackNotification(text: string, blocks?: unknown[]) {
   const url = process.env.SLACK_WEBHOOK_URL;
   if (!url) return;
@@ -35,7 +24,6 @@ export async function sendSlackNotification(text: string, blocks?: unknown[]) {
   }
 }
 
-/** Fired when someone points the notetaker at a call. */
 export function notetakerSummonedMessage(input: {
   requestedBy: string;
   title: string;
@@ -53,7 +41,6 @@ export function notetakerSummonedMessage(input: {
   );
 }
 
-/** Fired when a meeting we requested finishes processing. */
 export function meetingCompletedMessage(input: {
   title: string;
   requestedBy: string;

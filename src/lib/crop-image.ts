@@ -29,9 +29,6 @@ function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string) {
   });
 }
 
-/** Produces the square file that is persisted as a profile photo. The cropper
- * supplies source-image pixel coordinates, while the canvas normalizes every
- * successful crop to a compact avatar-sized image. */
 export async function createCroppedProfilePhoto(
   source: string,
   crop: Area,
