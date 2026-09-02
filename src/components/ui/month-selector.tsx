@@ -11,6 +11,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
+import { MONTH_NAMES } from '@/constants/months';
+
 interface MonthSelectorProps {
   value: string; // YYYY-MM format
   onChange: (value: string) => void;
@@ -33,20 +35,7 @@ export function MonthSelector({
   const currentDate = value ? new Date(value + '-01') : new Date();
   const [viewYear, setViewYear] = useState(currentDate.getFullYear());
 
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
+  const months = MONTH_NAMES;
 
   const isDateDisabled = (year: number, month: number) => {
     const dateString = `${year}-${(month + 1).toString().padStart(2, '0')}`;

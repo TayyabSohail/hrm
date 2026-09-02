@@ -18,20 +18,7 @@ import {
 
 import { cn } from '@/lib/utils';
 
-const MONTH_LABELS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+import { MONTH_LABELS } from '@/constants/months';
 
 type MonthFilterProps = {
   value: string;
