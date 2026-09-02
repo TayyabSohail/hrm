@@ -19,7 +19,7 @@ mode, shadcn/ui + Tailwind, React Hook Form + Zod, next-safe-action, pnpm.
 
 No JSDoc/block comments (`/** ... */`) and no multi-line prose comments — not on
 functions, components, types, or props. Don't explain code in paragraphs; let names and
-signatures do it. A comment is justified only when it states a *why* the code cannot,
+signatures do it. A comment is justified only when it states a _why_ the code cannot,
 and then it's **one short line**. Functional directives (`eslint-disable-*`,
 `@ts-expect-error`, `prettier-ignore`) always stay. Full rule:
 `.claude/docs/rules/comments.md`.

@@ -14,11 +14,6 @@ type ProjectRow = {
   url: string | null;
   is_active: boolean;
 };
-
-// The admin-managed list employees pick from when logging overtime. Only active
-// projects are returned — deactivating one (soft delete) removes it from the
-// dropdown, while existing logs still resolve their name through the FK. Any
-// authenticated user can read (RLS projects_select_authenticated).
 const fetchProjects = authQuery(async ({ supabase }) => {
   const { data, error } = await supabase
     .from('projects')

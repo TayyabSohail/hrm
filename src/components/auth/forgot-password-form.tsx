@@ -126,7 +126,9 @@ export function ForgotPasswordForm() {
       <Card>
         <CardHeader className='items-center text-center'>
           <UserX className='size-8 text-destructive' aria-hidden />
-          <CardTitle className='text-xl font-semibold'>Account disabled</CardTitle>
+          <CardTitle className='text-xl font-semibold'>
+            Account disabled
+          </CardTitle>
           <CardDescription>
             This account has been disabled and can no longer be accessed. Please
             contact your administrator if you think this is a mistake.

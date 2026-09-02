@@ -13,4 +13,6 @@ export const MONTH_NAMES = [
   'December',
 ] as const;
 
-export const MONTH_LABELS = MONTH_NAMES.map((month) => month.slice(0, 3));
+export const MONTH_LABELS: readonly string[] = MONTH_NAMES.map((month) =>
+  month.slice(0, 3),
+);

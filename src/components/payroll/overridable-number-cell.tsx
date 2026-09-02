@@ -18,11 +18,9 @@ type OverridableNumberCellProps = {
   step: number;
   disabled?: boolean;
   ariaLabel: string;
-  /** Non-null when an admin override is in effect — shows the reset control. */
   isOverridden: boolean;
   resetAriaLabel: string;
   resetTooltip: string;
-  /** Rendered under the input; omit for a single-line cell. */
   caption?: string;
   onCommit: (value: number | null) => void;
 };

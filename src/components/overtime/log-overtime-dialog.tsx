@@ -79,8 +79,9 @@ export function LogOvertimeDialog() {
         <DialogHeader>
           <DialogTitle>Log overtime</DialogTitle>
           <DialogDescription>
-            Only approved hours are paid out, at the configured overtime rate for
-            the pay period they fall in — pay is computed during the payroll run.
+            Only approved hours are paid out, at the configured overtime rate
+            for the pay period they fall in — pay is computed during the payroll
+            run.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -113,7 +114,6 @@ export function LogOvertimeDialog() {
               label='Project'
               options={projectOptions}
               placeholder='Select a project'
-
             />
             <FormField
               control={form.control}
