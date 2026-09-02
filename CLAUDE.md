@@ -15,6 +15,15 @@ mode, shadcn/ui + Tailwind, React Hook Form + Zod, next-safe-action, pnpm.
   the detailed, topic-by-topic rules under `.claude/docs/*`.
 - Docs index: `docs/index.md` (architecture, UI system, data layer, backend, QA)
 
+## Comments
+
+No JSDoc/block comments (`/** ... */`) and no multi-line prose comments — not on
+functions, components, types, or props. Don't explain code in paragraphs; let names and
+signatures do it. A comment is justified only when it states a *why* the code cannot,
+and then it's **one short line**. Functional directives (`eslint-disable-*`,
+`@ts-expect-error`, `prettier-ignore`) always stay. Full rule:
+`.claude/docs/rules/comments.md`.
+
 ## Priority when guidance conflicts
 
 1. Explicit instruction in the current chat

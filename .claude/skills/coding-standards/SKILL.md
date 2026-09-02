@@ -37,6 +37,8 @@ general engineering rules, `ui/` for frontend/component rules.
 
 - [`typescript.md`](../../docs/rules/typescript.md) — strict mode, no `any`, no
   unexplained `as`/`@ts-ignore`, Zod at every boundary
+- [`comments.md`](../../docs/rules/comments.md) — no JSDoc/block comments, no
+  multi-line prose; a comment is one short line explaining a *why* only
 - [`file-placement.md`](../../docs/rules/file-placement.md) — schemas/types/content
   data never inlined in components or actions, keep component/page files short, no
   premature abstraction
@@ -61,6 +63,8 @@ general engineering rules, `ui/` for frontend/component rules.
 ## Verification before calling frontend work done
 
 - [ ] No `any`; no unexplained `@ts-ignore`/`@ts-expect-error`/`as` cast
+- [ ] No JSDoc/block comments and no multi-line prose comments; every remaining
+      comment is one short line explaining a *why* the code can't state itself
 - [ ] Types/schemas live in `src/types|schema/*`, not inlined in a component or action
       file (a component's own `Props` type is the one exception)
 - [ ] Static content/config data (feature lists, step copy, nav items, etc.) lives in
