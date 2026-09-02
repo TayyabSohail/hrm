@@ -10,19 +10,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getInitials } from '@/lib/team';
 import { cn } from '@/lib/utils';
 
-/**
- * Employee identity anywhere a person is shown — directory rows, the approvals
- * queue, payroll, the policy roster, the notetaker widget.
- *
- * Profile photos live in the private `identity-docs` bucket, so each one is a
- * short-lived signed URL fetched per employee and cached by `useProfilePhoto`.
- * Initials are a genuine state, not just a loading placeholder: admins and
- * anyone who never completed onboarding have no photo at all.
- *
- * Loading and image-decoding are treated as distinct phases. Holding a skeleton
- * through both is what keeps initials meaningful — they appear only when there
- * is really no usable photo, rather than flashing on every render.
- */
 
 const SIZES = {
   sm: 'size-6 text-[10px]',

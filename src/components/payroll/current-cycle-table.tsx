@@ -30,14 +30,12 @@ import { ViewInvoiceButton } from './view-invoice-button';
 type PayslipGridProps = {
   rows: RunPayslipRow[];
   locked: boolean;
-  /** True while a recalc/lock is in flight — freezes the editable cells. */
   isBusy?: boolean;
   selectedIds: Set<string>;
   onToggleRow: (payslipId: string) => void;
   onToggleAll: () => void;
   onDaysWorkedCommit: (payslipId: string, daysWorked: number | null) => void;
   onOtMultiplierCommit: (payslipId: string, multiplier: number | null) => void;
-  /** `null` clears the override, handing the hours back to the approved logs. */
   onOtHoursCommit: (payslipId: string, hours: number | null) => void;
   onAddCustomField: (
     payslipId: string,
@@ -46,10 +44,6 @@ type PayslipGridProps = {
   onRemoveCustomField: (payslipId: string, index: number) => void;
 };
 
-/** The draft (or, once locked, frozen) payslip grid for one run. Earnings and
- *  deductions are grouped; OT multiplier, OT hours, unpaid days (the days-worked
- *  override), and the adjustment/deduction line items are editable while the run
- *  is open. Everything else is engine-computed and read-only. */
 export function CurrentCycleTable({
   rows,
   locked,
@@ -84,7 +78,6 @@ export function CurrentCycleTable({
             >
               Deductions
             </TableHead>
-            {/* Net Salary + Actions — ungrouped, so this spans both. */}
             <TableHead colSpan={2} className='h-8 border-l border-border' />
           </TableRow>
           <TableRow>
@@ -219,8 +212,6 @@ export function CurrentCycleTable({
                           ariaLabel={`Overtime hours for ${row.employeeName}`}
                           onCommit={(hours) => onOtHoursCommit(row.id, hours)}
                         />
-                        {/* Only reachable once overridden — an override detaches
-                            the row from the approved logs, so this is the way back. */}
                         {row.overtimeHoursOverride !== null && (
                           <Tooltip>
                             <TooltipTrigger asChild>

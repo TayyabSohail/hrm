@@ -21,7 +21,6 @@ export type { ApprovalKind };
 export type ApprovalItem = {
   id: string;
   kind: ApprovalKind;
-  /** Needed to resolve the employee's profile photo in the queue. */
   employeeId: string;
   employeeName: string;
   title: string;

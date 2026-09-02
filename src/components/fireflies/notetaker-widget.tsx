@@ -22,17 +22,6 @@ import { cn } from '@/lib/utils';
 
 import { FIREFLIES_LANGUAGES } from '@/schema/fireflies';
 
-/**
- * Floating notetaker widget, mounted on every signed-in surface.
- *
- * Two views: summon a bot, and the history of meetings you started or were
- * shared on. A finished recording is read on Fireflies — its row links straight
- * out — so nothing about the meeting's contents is rendered here.
- *
- * Note that `app.fireflies.ai` requires a Fireflies seat, which only the
- * account owner has. The transcript is still captured and stored server-side by
- * the webhook, so surfacing it in-app later needs no re-fetch.
- */
 
 const STATUS: Record<
   NotetakerMeeting['status'],
