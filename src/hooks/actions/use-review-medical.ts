@@ -9,12 +9,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Approve/reject a medical claim (admin). An approval is bounded server-side by
- *  `medical_balance()` and moves an approved employee's balance, so both the
- *  claim lists and every balance read are invalidated.
- *
- *  Callers must await `executeAsync` — `execute` does not invalidate. See the
- *  note on the wrapper below. */
 export function useReviewMedical(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   const action = useAction(reviewMedicalClaim, { onError });
@@ -32,8 +26,12 @@ export function useReviewMedical(onSuccess?: () => void) {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.MEDICAL_BALANCE] });
       // The unified approvals queue (pending_approvals()) and the admin
       // dashboard's pending-approvals tile both count this row.
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.PENDING_APPROVALS] });
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.DASHBOARD_SUMMARY] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.PENDING_APPROVALS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.DASHBOARD_SUMMARY],
+      });
       onSuccess?.();
     }
     return result;

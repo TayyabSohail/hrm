@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 
 type StepIndicatorProps = {
   steps: string[];
-  /** Zero-based index of the current step. */
   currentStep: number;
 };
 

@@ -8,11 +8,9 @@ export type InfoCardField = {
 type InfoCardProps = {
   title: string;
   fields: InfoCardField[];
-  /** Action slot in the header, e.g. an Edit button. */
   action?: React.ReactNode;
 };
 
-/** Read-only label/value card used for profile and record detail sections. */
 export function InfoCard({ title, fields, action }: InfoCardProps) {
   return (
     <Card>
@@ -23,11 +21,11 @@ export function InfoCard({ title, fields, action }: InfoCardProps) {
       <CardContent>
         <dl className='grid gap-x-6 gap-y-4 sm:grid-cols-2'>
           {fields.map((field) => (
-            <div key={field.label} className='flex flex-col gap-0.5'>
+            <div key={field.label} className='flex min-w-0 flex-col gap-0.5'>
               <dt className='text-xs font-medium uppercase tracking-wide text-muted-foreground'>
                 {field.label}
               </dt>
-              <dd className='text-sm'>{field.value || '—'}</dd>
+              <dd className='break-words text-sm'>{field.value || '—'}</dd>
             </div>
           ))}
         </dl>

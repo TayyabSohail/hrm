@@ -12,21 +12,8 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { QueryKeys } from '@/constants/query-keys';
 import { type MedicalClaimInput } from '@/schema/medical';
 
-/** Storage keys must be URL-safe; keep the original name on the DB row instead. */
 const safeName = (name: string) => name.replace(/[^a-zA-Z0-9._-]/g, '_');
 
-/**
- * Submit a medical claim end-to-end. The claim row is inserted (and admins
- * emailed) by the `createMedicalClaim` server action; the proof files are then
- * uploaded client-side into `medical-proofs/<uid>/<claimId>/…` under the
- * caller's own RLS (medproofs_own), one `medical_claim_files` row per file. The
- * index prefix keeps two same-named files distinct. Invalidates the caller's
- * history + balance, then hands back via `onSuccess` (close dialog, toast).
- *
- * The claim is created before the files exist, so a mid-flight upload failure
- * leaves a pending claim with fewer/no proofs; the toast surfaces it and an
- * admin can reject it — acceptable for now (mirrors the identity-docs flow).
- */
 export function useCreateMedicalClaim(onSuccess?: () => void) {
   const queryClient = useQueryClient();
 

@@ -31,8 +31,6 @@ import { SignOutButton } from './sign-out-button';
 import { UserCard } from './user-card';
 
 type AppSidebarProps = {
-  /** Nav config resolves client-side — icon components can't cross the
-   *  server→client boundary as props. */
   role: 'employee' | 'admin';
 };
 
@@ -60,8 +58,6 @@ export function AppSidebar({ role }: AppSidebarProps) {
       ? pathname === href
       : pathname === href || pathname.startsWith(`${href}/`);
 
-  /** Static badges come from the nav config; the employee Policies item
-   *  gets a live "needs acknowledgment" count instead. */
   const badgeFor = (item: { href: string; badge?: number }) =>
     role === 'employee' && item.href === paths.employee.policies
       ? unacknowledgedPolicies || undefined

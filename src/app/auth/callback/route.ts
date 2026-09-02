@@ -5,17 +5,6 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { appConfig } from '@/config/app';
 import { paths } from '@/constants/paths';
 
-/**
- * PKCE code-exchange endpoint: exchanges a `?code=` for a session, then forwards
- * to an internal `?next=` path.
- *
- * Password recovery no longer routes through here — it's delivered via Resend
- * with a `token_hash` that `RecoveryTokenVerifier` exchanges directly (mirroring
- * the invite flow), so no PKCE hop is involved. This route is now reserved for
- * the deferred Google OAuth flow: when it's added, this is where the OAuth
- * invite-only gate belongs — exchange the code, then require a matching
- * `employees` row before letting the session stand.
- */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const origin = appConfig.appUrl;

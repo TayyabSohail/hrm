@@ -25,9 +25,6 @@ type ProfilePhotoCardProps = {
   fullName: string;
 };
 
-/** Lets an employee replace the photo used in their sidebar. This deliberately
- * reuses the onboarding `photo` object, keeping one secure source of truth for
- * their identity photo rather than introducing a second storage location. */
 export function ProfilePhotoCard({
   employeeId,
   fullName,

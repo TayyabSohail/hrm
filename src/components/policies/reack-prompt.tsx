@@ -11,10 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { paths } from '@/constants/paths';
 
-/**
- * A simple employee dashboard banner for outstanding policy acknowledgments.
- * It remains visible until the employee completes the outstanding reviews.
- */
 export function ReackPrompt() {
   const { data: pending, isLoading } = usePendingAcknowledgments();
 

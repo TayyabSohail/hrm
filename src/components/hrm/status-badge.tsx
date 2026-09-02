@@ -18,8 +18,6 @@ type StatusBadgeProps = {
   status: RequestStatus | AccountStatus | PayrollCycleStatus;
 };
 
-/** Single mapping from any HRM status to a badge, so colors and labels stay
- *  consistent across modules. */
 export function StatusBadge({ status }: StatusBadgeProps) {
   // A status can briefly outlive a client deploy while a database migration is
   // rolling out. Render it safely instead of taking down the whole table.

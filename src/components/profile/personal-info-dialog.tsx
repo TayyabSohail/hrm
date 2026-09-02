@@ -32,9 +32,6 @@ type PersonalInfoDialogProps = {
   defaultValues: PersonalDetailsInput;
 };
 
-/** Admins maintain their own identity fields (name, DOB, CNIC) here. Employees'
- *  personal info is admin-managed and stays read-only on their profile — an
- *  admin has no admin above them, so they self-edit. */
 export function PersonalInfoDialog({ defaultValues }: PersonalInfoDialogProps) {
   const [open, setOpen] = useState(false);
 

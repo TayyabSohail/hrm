@@ -22,22 +22,6 @@ type RecoveryTokenVerifierProps = {
   tokenHash: string;
 };
 
-/**
- * Client half of the password-reset landing — the recovery counterpart to
- * `InviteTokenVerifier`.
- *
- * The reset page renders this only when there is NO session yet, so the emailed
- * `?token_hash=&type=recovery` is the sole proof of identity. A server component
- * can't write the auth cookies, so the token is exchanged here on the browser
- * client. On success a recovery session is established and we replace the URL
- * with a clean `/auth/reset-password` — the re-render reads the session (not the
- * URL) and shows the "set a new password" form, and the token no longer lingers
- * in the address bar or history.
- *
- * Expired / already-used / malformed tokens can't be exchanged. Rather than
- * bounce silently, we surface an explicit "link no longer valid" state that
- * points the user back to request a fresh reset link.
- */
 export function RecoveryTokenVerifier({
   tokenHash,
 }: RecoveryTokenVerifierProps) {

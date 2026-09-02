@@ -10,21 +10,10 @@ export const appConfig = {
   defaultLocale: 'en-PK',
   defaultCurrency: 'PKR',
   defaultCountryCode: 'PK',
-  /** Live exchange rates, used to show a Payoneer source balance in its own
-   *  currency. Keyless public endpoint; PKR is not an ECB reference currency,
-   *  which rules out Frankfurter and similar ECB-backed APIs. */
   fx: {
-    /** Base URL — the base currency is appended as a path segment. */
     ratesUrl: 'https://open.er-api.com/v6/latest',
-    /** Upstream only refreshes once a day, so a shorter window would just
-     *  re-fetch identical numbers. */
     staleTimeMs: 1000 * 60 * 60 * 6,
   },
-  /** Global TanStack Query defaults (see `providers.tsx`). Writes invalidate
-   *  their own keys explicitly, so these only govern passive refresh: reads stay
-   *  fresh for `staleTimeMs` before a background refetch, and we don't refetch on
-   *  window focus (it re-triggered every query, incl. an auth round-trip, on
-   *  every tab switch). Hooks that need different behaviour override locally. */
   reactQuery: {
     staleTimeMs: 1000 * 60,
     gcTimeMs: 1000 * 60 * 5,

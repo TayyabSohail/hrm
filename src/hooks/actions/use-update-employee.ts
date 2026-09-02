@@ -15,9 +15,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Shared invalidation for the admin profile editor: refresh both the detail
- *  query for this employee and the directory list (designation/type/department
- *  can change what the table shows). */
 function useInvalidateEmployee(employeeId: string) {
   const queryClient = useQueryClient();
   return () => {

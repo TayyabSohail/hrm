@@ -16,22 +16,14 @@ import { createLeaveRequestSchema, reviewLeaveSchema } from '@/schema/leave';
 
 import { LeaveType } from '@/types/hrm';
 
-/** Admin gate for the review action. The role check is server-side even though
- *  RLS also enforces it (mirrors the pattern in `actions/employees.ts`). */
+// Defense in depth: RLS enforces the same thing.
 const requireAdmin = (role?: string) => {
   if (role !== 'admin') throw new Error('Forbidden');
 };
 
-/** One-line human summary reused across the admin/employee emails. */
 const leaveSummary = (type: LeaveType, days: number, startDate: string) =>
   `${leaveTypeLabels[type]} · ${days} day(s) from ${formatDate(startDate)}`;
 
-/**
- * Best-effort fan-out: email every active admin that a leave request is waiting.
- * Runs service-role (`supabaseAdmin`) because the submitting employee can't read
- * the admin roster under RLS. Callers swallow its errors — a bounced
- * notification must never undo the already-committed insert.
- */
 async function notifyAdminsOfLeave(input: {
   employeeId: string;
   summary: string;
@@ -69,12 +61,6 @@ async function notifyAdminsOfLeave(input: {
   );
 }
 
-/**
- * Employee-submitted leave request. Runs as the caller (RLS `leave_insert_own`),
- * which pins `status = 'pending'` — an employee cannot self-approve. The schema
- * is the single enforcement point for Half Day = 0.5 (it rejects any other
- * value), so `parsedInput.days` is already correct here.
- */
 export const createLeaveRequest = authActionClient
   .schema(createLeaveRequestSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -95,8 +81,8 @@ export const createLeaveRequest = authActionClient
       .single();
     if (error) throw new Error(error.message);
 
-    // Notify admins out-of-band. The insert has already committed, so any
-    // failure here is logged, not thrown — the employee's submit still succeeds.
+    // The insert has committed, so a notification failure is logged, not
+    // thrown — the employee's submit still succeeds.
     try {
       await notifyAdminsOfLeave({
         employeeId: userId,
@@ -114,13 +100,6 @@ export const createLeaveRequest = authActionClient
     return data;
   });
 
-/**
- * Admin-only decision on a pending request. Stamps status/reviewer and, on a
- * rejection, the reason. The `.eq('status','pending')` guard makes it
- * idempotent: a row that already moved on matches nothing, so a re-fire is a
- * silent no-op rather than an out-of-order transition. The employee is emailed
- * the outcome (best-effort).
- */
 export const reviewLeaveRequest = authActionClient
   .schema(reviewLeaveSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -146,7 +125,7 @@ export const reviewLeaveRequest = authActionClient
       .select('id, employee_id, leave_type, num_days, start_date');
     if (error) throw new Error(error.message);
 
-    // No matched row (already reviewed / not found) → nothing to email.
+    // No matched row (already reviewed or not found) means nothing to email.
     const reviewed = data?.[0];
     if (reviewed) {
       try {

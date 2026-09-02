@@ -17,9 +17,6 @@ import { downloadUrl } from '@/utils/download-functions';
 
 type ExportArtifactsProps = { runId: string };
 
-/** The list of Payoneer files generated for a locked run, with download links.
- *  URLs are minted per click (fresh signed URL), gated by the admin storage
- *  policy. Renders nothing until at least one export exists. */
 export function ExportArtifacts({ runId }: ExportArtifactsProps) {
   const { data: exports, isLoading } = useRunExports(runId);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);

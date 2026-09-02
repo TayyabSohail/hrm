@@ -1,6 +1,5 @@
 'use client';
 
-import { UserMinus, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -8,13 +7,6 @@ import { useExportPayoneer } from '@/hooks/actions/use-export-payoneer';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Sheet,
   SheetContent,
@@ -27,41 +19,26 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-
-import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/utils/number-functions';
 
 import {
   BALANCE_CURRENCIES,
   type BalanceCurrency,
   DEFAULT_BALANCE_CURRENCY,
-  isBalanceCurrency,
 } from '@/constants/payroll-export';
 
+import { CurrencySelect } from './currency-select';
 import { PayoneerBalanceBreakdown } from './payoneer-balance-breakdown';
+import { PayoneerExportRow } from './payoneer-export-row';
 
-/** The only payslip fields the picker needs. `total` is the recipient PKR amount
- *  (shown for context only) — the file's authoritative amount is read from the
- *  frozen `payslips.total_pay` snapshot server-side. */
-export type PayoneerExportRow = {
-  employeeId: string;
-  employeeName: string;
-  total: number;
-};
+import { type PayoneerExportRow as PayoneerExportRowData } from '@/types/hrm';
 
 type ExportPayoneerSheetProps = {
   runId: string;
-  rows: PayoneerExportRow[];
+  rows: PayoneerExportRowData[];
   disabled?: boolean;
 };
 
@@ -75,8 +52,6 @@ export function ExportPayoneerSheet({
     {},
   );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  /** Left out of *this* file only — never persisted, so reopening the sheet (or
-   *  the next export) starts with the whole run included again. */
   const [excludedIds, setExcludedIds] = useState<Set<string>>(new Set());
   const [bulkCurrency, setBulkCurrency] = useState<BalanceCurrency>(
     DEFAULT_BALANCE_CURRENCY,
@@ -115,6 +90,9 @@ export function ExportPayoneerSheet({
         : new Set(rows.map((row) => row.employeeId)),
     );
   };
+
+  const setCurrencyFor = (employeeId: string, currency: BalanceCurrency) =>
+    setCurrencies((prev) => ({ ...prev, [employeeId]: currency }));
 
   const applyBulkCurrency = () => {
     setCurrencies((prev) => {
@@ -213,77 +191,18 @@ export function ExportPayoneerSheet({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((row) => {
-                const currency = currencyFor(row.employeeId);
-                const isExcluded = excludedIds.has(row.employeeId);
-                return (
-                  <TableRow key={row.employeeId}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedIds.has(row.employeeId)}
-                        onCheckedChange={() => toggleRow(row.employeeId)}
-                        aria-label={`Select ${row.employeeName}`}
-                      />
-                    </TableCell>
-                    <TableCell
-                      className={cn(
-                        'font-medium',
-                        isExcluded && 'text-muted-foreground line-through',
-                      )}
-                    >
-                      {row.employeeName}
-                    </TableCell>
-                    <TableCell
-                      className={cn(
-                        'text-center',
-                        isExcluded && 'text-muted-foreground line-through',
-                      )}
-                    >
-                      {formatCurrency(row.total)}
-                    </TableCell>
-                    <TableCell className='text-center'>
-                      <CurrencySelect
-                        value={currency}
-                        // An excluded row is paid from no balance in this file,
-                        // so the picker would be a lie. The choice is kept, and
-                        // comes back if they're included again.
-                        disabled={isExcluded}
-                        onValueChange={(next) =>
-                          setCurrencies((prev) => ({
-                            ...prev,
-                            [row.employeeId]: next,
-                          }))
-                        }
-                        triggerClassName='mx-auto h-9 w-28'
-                      />
-                    </TableCell>
-                    <TableCell className='text-center'>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            className='mx-auto h-8 w-8 text-muted-foreground'
-                            aria-label={
-                              isExcluded
-                                ? `Add ${row.employeeName} back to this export`
-                                : `Leave ${row.employeeName} out of this export`
-                            }
-                            onClick={() => toggleExcluded(row.employeeId)}
-                          >
-                            {isExcluded ? <UserPlus /> : <UserMinus />}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {isExcluded
-                            ? 'Excluded — add back to this export'
-                            : 'Leave out of this export'}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {rows.map((row) => (
+                <PayoneerExportRow
+                  key={row.employeeId}
+                  row={row}
+                  currency={currencyFor(row.employeeId)}
+                  isSelected={selectedIds.has(row.employeeId)}
+                  isExcluded={excludedIds.has(row.employeeId)}
+                  onToggleSelected={toggleRow}
+                  onToggleExcluded={toggleExcluded}
+                  onCurrencyChange={setCurrencyFor}
+                />
+              ))}
             </TableBody>
           </Table>
         </div>
@@ -313,41 +232,5 @@ export function ExportPayoneerSheet({
         </SheetFooter>
       </SheetContent>
     </Sheet>
-  );
-}
-
-type CurrencySelectProps = {
-  value: BalanceCurrency;
-  onValueChange: (value: BalanceCurrency) => void;
-  disabled?: boolean;
-  triggerClassName?: string;
-};
-
-/** The USD/GBP/EUR source-balance picker, shared by the bulk bar and each row. */
-function CurrencySelect({
-  value,
-  onValueChange,
-  disabled,
-  triggerClassName,
-}: CurrencySelectProps) {
-  return (
-    <Select
-      value={value}
-      disabled={disabled}
-      onValueChange={(next) => {
-        if (isBalanceCurrency(next)) onValueChange(next);
-      }}
-    >
-      <SelectTrigger className={triggerClassName}>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {BALANCE_CURRENCIES.map((option) => (
-          <SelectItem key={option} value={option}>
-            {option}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
   );
 }

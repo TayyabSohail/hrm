@@ -14,7 +14,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** After a self-service edit, refresh the caller's own profile read. */
 function useInvalidateMyProfile() {
   const queryClient = useQueryClient();
   return () =>

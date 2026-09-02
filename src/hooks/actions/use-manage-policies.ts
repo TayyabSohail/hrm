@@ -44,8 +44,6 @@ export function useCreatePolicy(
   });
 }
 
-/** Publish the next version of an existing policy (admin). The new version
- *  number comes back from the RPC — the client never computes it. */
 export function usePublishPolicyVersion(
   onSuccess?: (version: PolicyVersion) => void,
 ) {
@@ -67,8 +65,6 @@ export function usePublishPolicyVersion(
   });
 }
 
-/** Delete a policy document and refresh every view that derives policy or
- * acknowledgment state from it. */
 export function useDeletePolicy(onSuccess?: (policyId: string) => void) {
   const queryClient = useQueryClient();
   return useAction(deletePolicy, {

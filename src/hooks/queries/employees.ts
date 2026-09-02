@@ -57,9 +57,6 @@ function toEmployeeListItem(row: EmployeeListRow): EmployeeListItem {
   };
 }
 
-/** Map a joined employees row onto the `Employee` domain type, filling the
- *  gaps left by a not-yet-onboarded invitee (no detail rows yet) with sensible
- *  defaults. Shared by the admin directory and the self-service profile. */
 export function toEmployee(row: EmployeeRow): Employee {
   const { employment_details: work, bank_details: bank, socials: social } = row;
   return {
@@ -99,7 +96,8 @@ export function toEmployee(row: EmployeeRow): Employee {
     designation: work?.designation ?? '',
     department: work?.department ?? '',
     leavePoolDaysOverride: work?.leave_pool_days_override ?? null,
-    medicalAccrualMonthlyOverride: work?.medical_accrual_monthly_override ?? null,
+    medicalAccrualMonthlyOverride:
+      work?.medical_accrual_monthly_override ?? null,
     medicalCapOverride: work?.medical_cap_override ?? null,
     otMultiplierOverride: work?.ot_multiplier_override ?? null,
     status: row.account_status,
@@ -171,8 +169,7 @@ const fetchCurrentEmployee = authQuery<undefined, CurrentEmployee | null>(
   },
 );
 
-/** The signed-in employee's own identity row (self, via RLS). Kept on its own
- *  key so it doesn't collide with the full profile read (`useMyProfile`). */
+// The signed-in employee's own identity row (self, via RLS).
 export const useCurrentEmployee = () =>
   useQuery({
     queryKey: [QueryKeys.CURRENT_EMPLOYEE],

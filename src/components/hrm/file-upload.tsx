@@ -13,12 +13,8 @@ type FileUploadProps = {
   onChange: (files: File[]) => void;
   maxFiles?: number;
   maxSizeMb?: number;
-  /** Passed to the native input, e.g. 'image/png,application/pdf'. */
   accept?: string;
-  /** Enforced MIME allow-list (the `accept` attribute alone is only a hint the
-   *  user can bypass). Files outside this list are rejected. */
   allowedMimeTypes?: readonly string[];
-  /** Overrides the default "Up to N files, XMB each" helper line. */
   hint?: string;
   label?: string;
   disabled?: boolean;

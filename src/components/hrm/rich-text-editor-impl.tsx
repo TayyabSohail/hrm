@@ -21,15 +21,9 @@ type RichTextEditorProps = {
   value: string;
   onChange: (html: string) => void;
   disabled?: boolean;
-  /** Merged onto the wrapper — e.g. to let the editor stretch and fill a
-   *  flex column instead of the default capped height. */
   className?: string;
 };
 
-/** CKEditor 5, dynamically imported by `rich-text-editor.tsx` so it never
- *  runs during SSR (it touches the DOM at load time). Content is stored as
- *  HTML rather than a PDF so policy updates can carry a real changelog and
- *  render in-app instead of requiring a re-upload for every edit. */
 export function RichTextEditorImpl({
   value,
   onChange,

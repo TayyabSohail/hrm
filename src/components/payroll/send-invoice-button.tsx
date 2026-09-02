@@ -10,14 +10,9 @@ import { Button } from '@/components/ui/button';
 type SendInvoiceButtonProps = {
   payslipId: string;
   employeeName: string;
-  /** Invoices only go out on a locked run — the figures aren't final before
-   *  that, and the employee can't see the payslip under RLS either. */
   disabled?: boolean;
 };
 
-/** Mails one employee their payslip PDF — the per-row send/re-send. "Send
- *  notifications" fans the same email out to everyone at once; this targets a
- *  single row (e.g. to retry one that bounced). */
 export function SendInvoiceButton({
   payslipId,
   employeeName,

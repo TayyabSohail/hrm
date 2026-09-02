@@ -22,9 +22,6 @@ const fetchSystemConfig = authQuery(async ({ supabase }) => {
   } satisfies SystemConfig;
 });
 
-/** App-wide module toggles (feature flags) admins can change. Backed by the
- *  `system_config` singleton; saving invalidates this key (see
- *  `use-update-system-config`) so gated nav entries re-render immediately. */
 export const useSystemConfig = () =>
   useQuery({
     queryKey: [QueryKeys.SYSTEM_CONFIG],

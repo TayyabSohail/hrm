@@ -9,12 +9,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Approve/reject a leave request (admin). A decision moves the row out of
- *  `pending` and can change an approved employee's balance, so both the request
- *  lists and every balance read are invalidated.
- *
- *  Callers must await `executeAsync` — `execute` does not invalidate. See the
- *  note on the wrapper below. */
 export function useReviewLeave(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   const action = useAction(reviewLeaveRequest, { onError });
@@ -32,8 +26,12 @@ export function useReviewLeave(onSuccess?: () => void) {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.LEAVE_BALANCE] });
       // The unified approvals queue (pending_approvals()) and the admin
       // dashboard's pending-approvals tile both count this row.
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.PENDING_APPROVALS] });
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.DASHBOARD_SUMMARY] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.PENDING_APPROVALS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.DASHBOARD_SUMMARY],
+      });
       onSuccess?.();
     }
     return result;

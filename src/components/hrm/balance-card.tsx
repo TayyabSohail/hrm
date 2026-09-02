@@ -3,21 +3,10 @@ import { Progress } from '@/components/ui/progress';
 
 type BalanceCardProps = {
   title: string;
-  /** In 'consumed' mode: amount used against a shrinking pool (leave days
-   *  taken). In 'accrued' mode: the current available balance itself
-   *  (medical allowance accrued so far). */
   used: number;
-  /** The cap the balance runs against (22 days, 50,000 PKR…). */
   total: number;
-  /** Formats both numbers for display, e.g. formatCurrency or `${n} days`. */
   format?: (value: number) => string;
-  /** Extra line, e.g. "Unpaid taken this year: 2 days". */
   hint?: string;
-  /** 'consumed' (default): the pool shrinks as `used` grows — headline
-   *  shows what's left, the bar fills as it's used up (Leave).
-   *  'accrued': `used` IS the available balance — headline shows it
-   *  directly, and the bar fills as it grows toward the cap (Medical),
-   *  so more green means more available rather than less. */
   mode?: 'consumed' | 'accrued';
 };
 

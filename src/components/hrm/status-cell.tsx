@@ -16,9 +16,6 @@ type StatusCellProps = {
   rejectionReason?: string | null;
 };
 
-/** Status badge for a table cell. When rejected with a reason attached, the
- *  badge becomes clickable and reveals it in a popover instead of leaving
- *  the employee to guess why. */
 export function StatusCell({ status, rejectionReason }: StatusCellProps) {
   if (status === 'rejected' && !!rejectionReason) {
     return (

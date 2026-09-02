@@ -13,17 +13,9 @@ type Decision = 'approved' | 'rejected';
 type OvertimeReviewActionsProps = {
   itemId: string;
   employeeName: string;
-  /** Called after a committed decision so the parent can close the review
-   *  sheet. The queue refreshes via the mutation's own invalidation. */
   onReviewed: (decision: Decision) => void;
 };
 
-/**
- * Approve / reject controls for a single overtime log in the admin queue.
- * Backed by the real `reviewOvertimeLog` action (stamps status/reviewer, emails
- * the employee). Rejection reuses the shared `RejectRequestDialog` for the
- * required reason.
- */
 export function OvertimeReviewActions({
   itemId,
   employeeName,

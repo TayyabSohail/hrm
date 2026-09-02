@@ -27,7 +27,6 @@ export type ApprovalItem = {
   createdAt: string;
   status: RequestStatus;
   fields: { label: string; value: string }[];
-  /** Only present for medical claims. */
   proofFiles?: string[];
 };
 

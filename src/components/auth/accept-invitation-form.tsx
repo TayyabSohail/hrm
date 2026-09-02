@@ -30,14 +30,9 @@ import {
 } from '@/schema/auth';
 
 type AcceptInvitationFormProps = {
-  /** Read from the invite session on the server; shown read-only here. */
   email: string;
 };
 
-/** Landing screen for the emailed invitation link (PRD 4.2.2): the employee
- *  sets a password — which signs them in — then advances invited → onboarding
- *  and is routed straight into the onboarding wizard. There is no review gate
- *  or waiting screen in between. */
 export function AcceptInvitationForm({ email }: AcceptInvitationFormProps) {
   const router = useRouter();
 

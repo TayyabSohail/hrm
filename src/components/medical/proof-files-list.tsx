@@ -5,13 +5,9 @@ import { FileText, Loader2 } from 'lucide-react';
 import { useMedicalProofUrls } from '@/hooks/queries/medical';
 
 type ProofFilesListProps = {
-  /** Storage paths in the `medical-proofs` bucket. Signed on demand. */
   files: string[];
 };
 
-/** Lists a claim's attached proof files as short-lived signed-URL links. RLS on
- *  the bucket (medproofs_own / medproofs_admin) means an owner sees their own
- *  and an admin sees any. */
 export function ProofFilesList({ files }: ProofFilesListProps) {
   const { data: proofs, isLoading, isError } = useMedicalProofUrls(files);
 

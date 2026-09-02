@@ -2,14 +2,6 @@ type PolicyContentProps = {
   html: string;
 };
 
-/** Renders admin-authored policy HTML read-only. The stored markup is already
- *  safe: `actions/policies.ts` runs `sanitizeHtml()` over the CKEditor output
- *  before it reaches the database, so nothing outside the allow-list can ever
- *  be persisted. That sanitize-at-write boundary — not this component — is the
- *  security guarantee behind `dangerouslySetInnerHTML`.
- *
- *  Blocks carrying diff classes (see policy-diff.ts) are highlighted so
- *  employees can spot additions (green) and removals (red). */
 export function PolicyContent({ html }: PolicyContentProps) {
   return (
     <div

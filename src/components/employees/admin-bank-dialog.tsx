@@ -28,7 +28,6 @@ type AdminBankDialogProps = {
   defaultValues: BankInfoInput;
 };
 
-/** Admin edit of an employee's bank details on the profile page. */
 export function AdminBankDialog({
   employeeId,
   defaultValues,

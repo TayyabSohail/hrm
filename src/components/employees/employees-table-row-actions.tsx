@@ -33,8 +33,6 @@ type EmployeesTableRowActionsProps = {
   employee: EmployeeListItem;
 };
 
-/** Per-row directory controls: view, invite management while still invited,
- * and reversible access control. Completed onboarding activates automatically. */
 export function EmployeesTableRowActions({
   employee,
 }: EmployeesTableRowActionsProps) {
@@ -97,7 +95,6 @@ export function EmployeesTableRowActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Dialogs live outside the menu so closing the menu doesn't unmount them. */}
       {isInvited && (
         <CancelInviteDialog
           employeeId={employee.id}

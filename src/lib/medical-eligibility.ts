@@ -1,9 +1,5 @@
 import { Employee } from '@/types/hrm';
 
-/** Medical Allowance Policy §1: full-time, confirmed employees only.
- *  Probation and notice-period employees aren't eligible even if
- *  full-time; part-time isn't eligible unless their contract states
- *  otherwise (not modeled here — treated as ineligible by default). */
 export function getMedicalIneligibilityReason(
   employee: Employee,
 ): string | null {

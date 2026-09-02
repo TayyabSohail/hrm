@@ -33,8 +33,6 @@ type PolicyEditorPageContentProps = {
   policyId: string;
 };
 
-/** Four actions share the header, so they run one size down from the usual
- *  `sm` to avoid crowding it. */
 const compactButton = 'h-8 gap-1.5 px-2.5 text-xs [&_svg]:size-3.5';
 
 export function PolicyEditorPageContent({
@@ -177,10 +175,6 @@ export function PolicyEditorPageContent({
         />
       </PageHeader>
 
-      {/* Keyed on the version being edited: when a publish lands and the query
-          refetches, `latest` becomes the new version and the editor remounts
-          carrying its body — so what's on screen always matches the active
-          version in the header. */}
       <RichTextEditor
         key={`v${latest.version}-${editorNonce}`}
         value={content}

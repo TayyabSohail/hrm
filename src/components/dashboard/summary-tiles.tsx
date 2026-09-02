@@ -20,11 +20,6 @@ import { paths } from '@/constants/paths';
 const tileLink =
   'block rounded-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:ring-2 hover:ring-ring';
 
-/**
- * Admin-home summary tiles, driven by the single guarded dashboard_summary()
- * RPC. Combined pending is derived here from the one payload (never four count
- * queries). Each tile deep-links into the matching admin surface.
- */
 export function SummaryTiles() {
   const { data, isPending, isError, error } = useDashboardSummary();
 

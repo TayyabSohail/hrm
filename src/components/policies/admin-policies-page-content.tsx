@@ -123,8 +123,6 @@ export function AdminPoliciesPageContent() {
           )}
         </TabsContent>
 
-        {/* Linkage tab removed; configuration is on the 'Configuration' tab. */}
-
         <TabsContent value='configuration'>
           <p className='mb-4 text-sm text-muted-foreground'>
             Module-wide values applied whenever leave, medical allowance, or

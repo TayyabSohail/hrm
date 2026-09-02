@@ -10,26 +10,15 @@ import {
   socialAccountsSchema,
 } from '@/schema/onboarding';
 
-/**
- * Invite-link landing. The invitee arrives already in a Supabase session
- * established by the emailed link (verified via /auth/callback). They set a
- * password — which signs them in for good — and then advance their own row
- * `invited → onboarding` via the caller-only `accept_onboarding()` RPC.
- *
- * The action runs as the caller (RLS + RPC), never service-role:
- * `accept_onboarding()` is security-definer and self-scoped, so it can only
- * advance the caller's own invite and only from the `invited` state.
- */
 export const acceptInvite = authActionClient
   .schema(acceptInvitationSchema)
   .action(async ({ parsedInput: { password }, ctx: { supabase } }) => {
     const { error: passwordError } = await supabase.auth.updateUser({
       password,
     });
-    // A prior attempt can successfully save the password but fail before the
-    // status-transition RPC. Re-sending an invite does not reset that password;
-    // accepting the same value again should therefore continue the pending
-    // lifecycle transition instead of trapping the employee on this screen.
+    // A prior attempt can save the password but fail before the transition RPC.
+    // Re-accepting the same password must continue that pending transition
+    // rather than trapping the employee on this screen.
     if (passwordError && passwordError.code !== 'same_password') {
       throw new Error(
         'Could not set your password. The invitation link may have expired — ask your admin to resend it.',
@@ -42,17 +31,10 @@ export const acceptInvite = authActionClient
     }
   });
 
-// ---------------------------------------------------------------------------
-// Onboarding wizard — per-section autosave, keyed on the caller (auth.uid()).
-//
-// Every write runs as the caller (RLS), never service-role. The `employees`
-// row already exists (created at invite), so section 1 is a plain UPDATE;
-// bank_details / socials rows may not exist yet, so those sections UPSERT.
-// None of these touch a protected column (role / account_status), so they
-// pass guard_employee_columns() without any bypass.
-// ---------------------------------------------------------------------------
+// Onboarding wizard — per-section autosave. Every write runs as the caller and
+// touches no protected column, so guard_employee_columns() passes. The
+// employees row exists from the invite; the satellites may not, so they upsert.
 
-/** Section 1 · Personal. Plain update of the caller's own employees row. */
 export const savePersonal = authActionClient
   .schema(personalInfoSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -74,7 +56,6 @@ export const savePersonal = authActionClient
     if (error) throw new Error(error.message);
   });
 
-/** Section 2 · Bank. Upsert — the bank_details row may not exist yet. */
 export const saveBank = authActionClient
   .schema(bankInfoSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -91,7 +72,6 @@ export const saveBank = authActionClient
     if (error) throw new Error(error.message);
   });
 
-/** Section 3 · Socials. Upsert — the socials row may not exist yet. */
 export const saveSocials = authActionClient
   .schema(socialAccountsSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -106,9 +86,6 @@ export const saveSocials = authActionClient
     if (error) throw new Error(error.message);
   });
 
-/** Section 5 · Complete. Explicit consent activates the caller atomically:
- * `submit_onboarding()` moves onboarding → active and stamps consent/activation.
- * No admin review or notification is part of this transition. */
 export const submitOnboarding = authActionClient
   .schema(consentSchema)
   .action(async ({ ctx: { supabase } }) => {

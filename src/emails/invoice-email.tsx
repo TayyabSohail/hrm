@@ -4,26 +4,14 @@ import { EmailLayout } from '@/emails/components/email-layout';
 import { emailStyles } from '@/emails/theme';
 
 export type InvoiceEmailProps = {
-  /** Full name of the employee, when known. */
   fullName?: string | null;
-  /** Human-readable pay period, e.g. "June 2026". */
   cycleLabel: string;
-  /** Deep link back to the employee's payslips page. */
   payslipsUrl: string;
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo. */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
 };
 
-/**
- * Sent to the employee once their payroll run is locked — the point at which the
- * figures are frozen and their payslip becomes visible to them under RLS. The
- * payslip PDF rides along as an attachment (see `send-invoice-emails.ts`), so
- * this body stays a short cover note with one direct link back to the payslip.
- */
 export function InvoiceEmail({
   fullName,
   cycleLabel,

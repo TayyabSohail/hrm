@@ -9,8 +9,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Remove a custom line item from a payslip and recalc the run. Invalidates the
- *  run's payslips and the run list. */
 export function useRemovePayslipCustomField(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useAction(removePayslipCustomField, {

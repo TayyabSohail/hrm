@@ -15,9 +15,6 @@ interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
   column: Column<TData, TValue>;
   title: string;
-  /** Must match the alignment the column's cell renderer uses (e.g.
-   *  CenteredCell) — otherwise the header sits beside its data instead
-   *  of above it. Defaults to 'left'. */
   align?: 'left' | 'center' | 'right';
 }
 

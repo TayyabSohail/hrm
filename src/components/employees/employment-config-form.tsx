@@ -51,7 +51,6 @@ type EmploymentConfigFormProps = {
   employee: Employee;
 };
 
-/** Admin-only payroll configuration (PRD 4.1) — not part of onboarding. */
 export function EmploymentConfigForm({ employee }: EmploymentConfigFormProps) {
   const { data: settings } = useHrmSettings();
 
@@ -77,7 +76,9 @@ export function EmploymentConfigForm({ employee }: EmploymentConfigFormProps) {
   const { execute: resetOverrides, isPending: isResetting } =
     useResetEmployeeAllowanceOverrides(employee.id, () => {
       form.setValue('leavePoolDaysOverride', '', { shouldDirty: false });
-      form.setValue('medicalAccrualMonthlyOverride', '', { shouldDirty: false });
+      form.setValue('medicalAccrualMonthlyOverride', '', {
+        shouldDirty: false,
+      });
       form.setValue('medicalCapOverride', '', { shouldDirty: false });
       form.setValue('otMultiplierOverride', '', { shouldDirty: false });
       toast.success('Allowance overrides reset to the global settings');
@@ -203,7 +204,6 @@ export function EmploymentConfigForm({ employee }: EmploymentConfigFormProps) {
                 </FormItem>
               )}
             />
-            {/* Spacer so the two medical fields sit together on their own row. */}
             <div className='hidden sm:block' aria-hidden />
             <FormField
               control={form.control}
@@ -217,7 +217,9 @@ export function EmploymentConfigForm({ employee }: EmploymentConfigFormProps) {
                       min={0}
                       step={500}
                       placeholder={
-                        settings ? `${settings.medicalMonthlyAccrual}` : 'Inherit'
+                        settings
+                          ? `${settings.medicalMonthlyAccrual}`
+                          : 'Inherit'
                       }
                       {...field}
                       value={field.value ?? ''}
@@ -293,7 +295,11 @@ export function EmploymentConfigForm({ employee }: EmploymentConfigFormProps) {
 
             <div className='sm:col-span-2'>
               <div className='flex flex-wrap gap-3'>
-                <Button type='submit' isLoading={isPending} disabled={isResetting}>
+                <Button
+                  type='submit'
+                  isLoading={isPending}
+                  disabled={isResetting}
+                >
                   Save configuration
                 </Button>
                 <Button

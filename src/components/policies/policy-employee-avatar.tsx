@@ -14,9 +14,6 @@ type PolicyEmployeeAvatarProps = {
   fullName: string;
 };
 
-/** Employee identity in the policy acknowledgement roster. A private, signed
- * profile image is used when available; initials appear only when no image is
- * available or it fails to load. */
 export function PolicyEmployeeAvatar({
   employeeId,
   fullName,

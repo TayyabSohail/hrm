@@ -27,18 +27,10 @@ type PendingQueueTableProps<TData> = {
   columns: ColumnDef<TData>[];
   isLoading?: boolean;
   emptyState: { icon?: LucideIcon; title: string; description?: string };
-  /** Enables a global search box with this placeholder; omit to hide it. */
   searchPlaceholder?: string;
-  /** Extra toolbar controls (e.g. faceted filters), given the table instance. */
   toolbar?: (table: TTable<TData>) => ReactNode;
 };
 
-/**
- * Generic review-queue shell (BIT-10): a `DataTable` parametrised by columns +
- * row actions, wrapping the boilerplate every pending queue shares — sorting,
- * filtering, pagination, and loading/empty states. Later modules (the unified
- * approvals queue) reuse this shell by passing their own columns.
- */
 export function PendingQueueTable<TData>({
   data,
   columns,

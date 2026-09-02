@@ -15,15 +15,10 @@ import {
 import type { CSSProperties } from 'react';
 
 export type InviteEmailProps = {
-  /** Full name of the invitee, when known. */
   fullName?: string | null;
-  /** One-time link that lands on `/auth/accept-invitation`. */
   inviteUrl: string;
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo (email clients can't load SVG/relative assets). */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
 };
 

@@ -19,15 +19,11 @@ type DetailSheetProps = {
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
-  /** Label/value rows describing the record (request fields, employee context…). */
   fields: DetailField[];
-  /** Extra content below the fields (proof files, balances, notes…). */
   children?: React.ReactNode;
-  /** Action row, e.g. approve/reject buttons. */
   footer?: React.ReactNode;
 };
 
-/** Generic slide-in detail panel used by the approvals queue and record views. */
 export function DetailSheet({
   open,
   onOpenChange,

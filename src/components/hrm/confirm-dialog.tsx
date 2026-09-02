@@ -14,17 +14,12 @@ import {
 } from '@/components/ui/dialog';
 
 type ConfirmDialogProps = {
-  /** The element that opens the dialog (rendered via asChild). */
   trigger: React.ReactNode;
   title: string;
   description: string;
   confirmLabel?: string;
-  /** Style the confirm button as destructive (reject, delete, lock). */
   destructive?: boolean;
-  /** Extra loading flag from the caller (OR-ed with the internal await state). */
   isLoading?: boolean;
-  /** May be async — the dialog awaits it, keeping itself open with the confirm
-   *  button in its loading state until the action settles. */
   onConfirm: () => void | Promise<unknown>;
 };
 

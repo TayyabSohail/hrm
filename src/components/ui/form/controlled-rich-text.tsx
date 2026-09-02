@@ -15,10 +15,7 @@ type ControlledRichTextProps<TFieldValues extends FieldValues> = {
   name: FieldPath<TFieldValues>;
   label?: string;
   disabled?: boolean;
-  /** Applied to the FormItem — e.g. `flex-1` so the field stretches inside
-   *  a flex column (a sheet) instead of hugging its content. */
   containerClassName?: string;
-  /** Forwarded to the editor wrapper for height/layout overrides. */
   editorClassName?: string;
 };
 

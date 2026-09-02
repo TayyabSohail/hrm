@@ -38,28 +38,15 @@ import {
 } from '@/schema/payroll';
 
 type CustomFieldsCellProps = {
-  /** This column's line items, as positive magnitudes. */
   fields: { label: string; amount: number }[];
-  /** Named in the dialog header — the trigger is a bare figure in a dense grid,
-   *  so this is the user's only confirmation they opened the right row. */
   employeeName: string;
-  /** Which column this cell sits in. Drives the copy; the caller applies the
-   *  matching sign. */
   kind: PayslipLineItemKind;
   onAdd: (field: { label: string; amount: number }) => void;
-  /** Removes the item at the given index of `fields` (the caller maps it
-   *  back to its own storage). Omit to disallow removal. */
   onRemove?: (index: number) => void;
-  /** True once the cycle is locked — the dialog drops to read-only. */
   disabled?: boolean;
-  /** True while a payroll write is in flight — freezes the dialog's actions. */
   isSubmitting?: boolean;
 };
 
-/** Per-employee ad-hoc line items (bonus, loan, etc.) that fold into the row's
- *  total. The cell itself stays a compact trigger — the running sum once items
- *  exist, a plain "+" before that — and opens a dialog that lists what's there
- *  and adds more. */
 export function CustomFieldsCell({
   fields,
   employeeName,

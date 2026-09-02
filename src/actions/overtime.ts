@@ -12,22 +12,14 @@ import { appConfig } from '@/config/app';
 import { paths } from '@/constants/paths';
 import { overtimeLogSchema, reviewOvertimeSchema } from '@/schema/overtime';
 
-/** Admin gate for the review action. The role check is server-side even though
- *  RLS also enforces it (mirrors `actions/leave.ts`). */
+// Defense in depth: RLS enforces the same thing.
 const requireAdmin = (role?: string) => {
   if (role !== 'admin') throw new Error('Forbidden');
 };
 
-/** One-line human summary reused across the admin/employee emails. */
 const overtimeSummary = (hours: number, projectName: string) =>
   `${hours} hr(s) · ${projectName}`;
 
-/**
- * Best-effort fan-out: email every active admin that an overtime log is waiting.
- * Runs service-role (`supabaseAdmin`) because the submitting employee can't read
- * the admin roster under RLS. Callers swallow its errors — a bounced
- * notification must never undo the already-committed insert.
- */
 async function notifyAdminsOfOvertime(input: {
   employeeId: string;
   projectId: string;
@@ -73,12 +65,6 @@ async function notifyAdminsOfOvertime(input: {
   );
 }
 
-/**
- * Employee-submitted overtime log. Runs as the caller (RLS `overtime_insert_own`
- * pins `status = 'pending'` and `employee_id = auth.uid()`), so an employee can
- * neither self-approve nor log for someone else. No rate/pay is captured — pay
- * is resolved at the payroll run against only approved, unswept logs.
- */
 export const createOvertimeLog = authActionClient
   .schema(overtimeLogSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -99,8 +85,8 @@ export const createOvertimeLog = authActionClient
       .single();
     if (error) throw new Error(error.message);
 
-    // Notify admins out-of-band. The insert has already committed, so any
-    // failure here is logged, not thrown — the employee's submit still succeeds.
+    // The insert has committed, so a notification failure is logged, not
+    // thrown — the employee's submit still succeeds.
     try {
       await notifyAdminsOfOvertime({
         employeeId: userId,
@@ -115,13 +101,6 @@ export const createOvertimeLog = authActionClient
     return data;
   });
 
-/**
- * Admin-only decision on a pending log. Stamps status/reviewer and, on a
- * rejection, the reason (cleared to null on approve). The `.eq('status','pending')`
- * guard makes it idempotent: a row that already moved on matches nothing, so a
- * re-fire is a silent no-op rather than an out-of-order transition. The employee
- * is emailed the outcome (best-effort).
- */
 export const reviewOvertimeLog = authActionClient
   .schema(reviewOvertimeSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -147,7 +126,7 @@ export const reviewOvertimeLog = authActionClient
       .select('id, employee_id, hours, projects(name)');
     if (error) throw new Error(error.message);
 
-    // No matched row (already reviewed / not found) → nothing to email.
+    // No matched row (already reviewed or not found) means nothing to email.
     const reviewed = data?.[0];
     if (reviewed) {
       try {

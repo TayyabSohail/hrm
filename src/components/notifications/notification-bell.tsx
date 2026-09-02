@@ -25,17 +25,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import type { Notification } from '@/types/hrm';
 
-/** Badges beyond 9 collapse to "9+" so the count never widens the bell. */
+// Badges beyond 9 collapse to "9+" so the count never widens the bell.
 const formatBadge = (count: number) => (count > 9 ? '9+' : String(count));
 
-/**
- * The shared employee/admin notification bell. Shows an unread-count badge and
- * a dropdown feed (newest first); clicking a notification navigates to its
- * `link` and marks it read, and "Mark all as read" clears the caller's count.
- *
- * The unread count comes from its own `head` count query (accurate even past the
- * 50-row feed cap); the per-row unread dot comes from each row's `readAt`.
- */
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const router = useRouter();

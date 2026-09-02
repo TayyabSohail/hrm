@@ -15,18 +15,12 @@ import { cn } from '@/lib/utils';
 
 import { MaskedInput } from './masked-input';
 
-/** Declarative config for a single text/masked field, kept in `constants/*`. */
 export type TextFieldConfig<TName extends string = string> = {
   name: TName;
   label: string;
   placeholder?: string;
-  /** `digits` allows digits only; `cnic` auto-inserts dashes. */
   mask?: 'digits' | 'cnic';
-  /** Character cap. Pass a function of the current value when the cap depends on
-   *  what's been typed (e.g. a Pakistan mobile number starting with 0 caps at
-   *  11 digits, an international one at 15). */
   maxLength?: number | ((value: string) => number);
-  /** Span both columns in a 2-column grid layout. */
   fullWidth?: boolean;
 };
 
@@ -35,12 +29,6 @@ type ControlledTextFieldProps<T extends FieldValues> = {
   config: TextFieldConfig<Path<T>>;
 };
 
-/**
- * Renders one RHF-controlled text field from a `TextFieldConfig`, choosing a
- * plain `Input` or a sanitising `MaskedInput` based on the config's `mask`. Used
- * across the onboarding wizard and every profile/admin editor so validation and
- * input rules stay identical wherever a field appears.
- */
 export function ControlledTextField<T extends FieldValues>({
   control,
   config,

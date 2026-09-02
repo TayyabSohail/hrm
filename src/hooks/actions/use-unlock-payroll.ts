@@ -9,7 +9,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Reopen and recalculate a locked run, then refresh every affected view. */
 export function useUnlockPayroll(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useAction(unlockPayroll, {

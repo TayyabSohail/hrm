@@ -15,24 +15,13 @@ import type { ReactNode } from 'react';
 import { brand, emailStyles } from '@/emails/theme';
 
 export type EmailLayoutProps = {
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo (email clients can't load
-   *  SVG/relative assets). */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
-  /** Inbox-preview snippet (hidden preheader text). */
   preview: string;
-  /** The card(s) that make up the body of the specific email. */
   children: ReactNode;
 };
 
-/**
- * Shared chrome for the onboarding lifecycle emails: branded header, the
- * per-template body, and the support footer. Mirrors the structure of
- * `invite-email.tsx` so every transactional message reads as one system.
- */
 export function EmailLayout({
   appName,
   baseUrl,
@@ -82,5 +71,5 @@ export function EmailLayout({
   );
 }
 
-/** Shared accent colour handle so templates don't reach into the palette. */
+// Shared accent colour handle so templates don't reach into the palette.
 export { brand };

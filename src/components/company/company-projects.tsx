@@ -9,8 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-/** Read-only view of the company's active projects, for the employee-facing
- *  Company page. Admins manage the list under Policies → Configuration. */
 export function CompanyProjects() {
   const { data: projects, isLoading } = useProjects();
 

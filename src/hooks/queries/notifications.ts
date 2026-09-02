@@ -6,8 +6,6 @@ import { QueryKeys } from '@/constants/query-keys';
 
 import { Notification } from '@/types/hrm';
 
-/** RLS (`notif_select_own`) returns only the caller's own rows, so neither of
- *  these queries filters by recipient — the row-level policy is the boundary. */
 const NOTIFICATION_COLUMNS = 'id, type, title, body, link, read_at, created_at';
 
 type NotificationRow = {
@@ -31,8 +29,6 @@ const toNotification = (row: NotificationRow) =>
     createdAt: row.created_at,
   }) satisfies Notification;
 
-/** The caller's feed, newest first. Capped at 50 — the bell is a recent-events
- *  view, not an archive. */
 const fetchNotifications = authQuery(
   async ({ supabase, user }): Promise<Notification[]> => {
     const { data, error } = await supabase
@@ -47,7 +43,6 @@ const fetchNotifications = authQuery(
   },
 );
 
-/** Just the unread count for the badge — a `head` count, so no rows travel. */
 const fetchUnreadCount = authQuery(
   async ({ supabase, user }): Promise<number> => {
     const { count, error } = await supabase
@@ -61,13 +56,8 @@ const fetchUnreadCount = authQuery(
   },
 );
 
-/** Poll interval for the bell. The shell (and therefore the bell) persists
- *  across in-app navigation, so it won't refetch on route changes; a modest
- *  interval plus the default window-focus refetch keeps the badge fresh without
- *  a realtime subscription (BIT-26 marks realtime optional for MVP). */
 const NOTIFICATION_REFETCH_MS = 60_000;
 
-/** The bell's dropdown feed. */
 export const useNotifications = () =>
   useQuery({
     queryKey: [QueryKeys.NOTIFICATIONS],
@@ -75,8 +65,6 @@ export const useNotifications = () =>
     refetchInterval: NOTIFICATION_REFETCH_MS,
   });
 
-/** The bell's unread badge. Kept a separate query so the count stays cheap and
- *  can be invalidated on its own after mark-read. */
 export const useUnreadCount = () =>
   useQuery({
     queryKey: [QueryKeys.NOTIFICATIONS_UNREAD],

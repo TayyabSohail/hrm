@@ -10,9 +10,6 @@ type EmploymentReadonlyProps = {
   employee: Employee;
 };
 
-/** Employment & payroll details are admin-owned (salary, designation,
- *  department, type). Rendered read-only here — there is no self-write policy
- *  on `employment_details`, so the DB backs this too (BIT-11). */
 export function EmploymentReadonly({ employee }: EmploymentReadonlyProps) {
   return (
     <InfoCard

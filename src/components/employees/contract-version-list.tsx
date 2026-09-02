@@ -13,9 +13,6 @@ type ContractVersionListProps = {
   versions: ContractVersion[];
 };
 
-/** The `contracts` bucket is private, so each row opens through a short-lived
- *  signed URL minted on render (see `proof-files-list.tsx` for the same
- *  pattern). A row stays inert until its URL resolves. */
 export function ContractVersionList({ versions }: ContractVersionListProps) {
   const { data: urls } = useContractFileUrls(
     versions.map((version) => version.storagePath),

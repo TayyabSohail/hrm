@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { ScrollableDialogContent } from '@/components/hrm/scrollable-dialog-content';
 import { Button } from '@/components/ui/button';
@@ -25,25 +24,15 @@ import {
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 
-const rejectSchema = z.object({
-  reason: z.string().min(5, 'Enter a reason (at least 5 characters)'),
-});
-type RejectInput = z.infer<typeof rejectSchema>;
+import { type RejectReasonInput, rejectReasonSchema } from '@/schema/common';
 
 type RejectRequestDialogProps = {
-  /** The element that opens the dialog (rendered via asChild). */
   trigger: React.ReactNode;
   title: string;
   description: string;
-  /** May be async — the dialog awaits it, so the submit button shows its
-   *  loading state and the dialog stays open until the decision settles.
-   *  Return `false` to keep the dialog open (e.g. the mutation failed), so the
-   *  typed reason isn't lost; anything else closes it. */
   onConfirm: (reason: string) => boolean | void | Promise<boolean | void>;
 };
 
-/** Rejecting requires a reason — it's stored on the request and shown to
- *  the employee, instead of a bare status flip with no explanation. */
 export function RejectRequestDialog({
   trigger,
   title,
@@ -51,12 +40,12 @@ export function RejectRequestDialog({
   onConfirm,
 }: RejectRequestDialogProps) {
   const [open, setOpen] = useState(false);
-  const form = useForm<RejectInput>({
-    resolver: zodResolver(rejectSchema),
+  const form = useForm<RejectReasonInput>({
+    resolver: zodResolver(rejectReasonSchema),
     defaultValues: { reason: '' },
   });
 
-  const onSubmit = async (values: RejectInput) => {
+  const onSubmit = async (values: RejectReasonInput) => {
     const result = await onConfirm(values.reason);
     if (result === false) return; // failed — keep open with the reason intact
     setOpen(false);

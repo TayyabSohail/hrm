@@ -4,29 +4,16 @@ import { EmailLayout } from '@/emails/components/email-layout';
 import { brand, emailStyles } from '@/emails/theme';
 
 export type LeaveDecisionEmailProps = {
-  /** Full name of the employee, when known. */
   fullName?: string | null;
-  /** The admin's decision on the request. */
   decision: 'approved' | 'rejected';
-  /** Human-readable one-liner, e.g. "Paid Leave · 3 day(s) from Jul 8, 2026". */
   summary: string;
-  /** The admin's reason — required and rendered when rejected. */
   rejectionReason?: string | null;
-  /** Deep link back to the employee's leave page. */
   leaveUrl: string;
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo. */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
 };
 
-/**
- * Sent to the employee when an admin approves or rejects their leave request.
- * Approved reads as a green confirmation; rejected surfaces the admin's reason
- * verbatim in an amber callout (the same reason shown in their history UI).
- */
 export function LeaveDecisionEmail({
   fullName,
   decision,

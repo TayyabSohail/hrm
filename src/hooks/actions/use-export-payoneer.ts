@@ -11,12 +11,6 @@ import { downloadUrl } from '@/utils/download-functions';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/**
- * Generate the Payoneer file for a locked run (admin). The action is the source
- * of truth: it uploads the artifact + records the export row, then returns a
- * short-lived signed URL we use to download that exact file immediately. Also
- * invalidates the run-export list so the history drill-down shows the new file.
- */
 export function useExportPayoneer(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useAction(exportPayoneer, {

@@ -41,7 +41,6 @@ const fetchDashboardSummary = authQuery(
   },
 );
 
-/** Admin home: the guarded dashboard_summary() bundle. */
 export const useDashboardSummary = () =>
   useQuery({
     queryKey: [QueryKeys.DASHBOARD_SUMMARY],
@@ -61,7 +60,6 @@ const fetchEmployeesByStatus = authQuery(
   },
 );
 
-/** Admin: employee headcount broken down by account_status. */
 export const useEmployeesByStatus = () =>
   useQuery({
     queryKey: [QueryKeys.EMPLOYEES_BY_STATUS],

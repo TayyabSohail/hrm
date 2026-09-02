@@ -6,7 +6,6 @@ type StatCardProps = {
   label: string;
   value: string | number;
   icon?: LucideIcon;
-  /** Small line under the value, e.g. "3 awaiting review". */
   hint?: string;
 };
 

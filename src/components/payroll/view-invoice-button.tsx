@@ -12,8 +12,6 @@ type ViewInvoiceButtonProps = {
   payslip: Payslip;
 };
 
-/** Opens the payslip PDF in a new tab instead of downloading it, for a
- *  quick look before deciding whether to send it. */
 export function ViewInvoiceButton({ payslip }: ViewInvoiceButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 

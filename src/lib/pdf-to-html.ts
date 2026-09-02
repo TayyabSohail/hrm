@@ -5,26 +5,18 @@ import type {
 
 import { escapeHtml } from '@/lib/escape-html';
 
-/** One visual line of the PDF, reassembled from positioned glyph runs. */
 type PdfLine = {
   text: string;
   height: number;
   bold: boolean;
-  /** Vertical gap to the previous line on the same page (0 for the first). */
   gapBefore: number;
 };
 
 const BULLET_PATTERN = /^[•·▪●◦\-–*]\s+/;
 const ORDERED_PATTERN = /^\d{1,2}[.)]\s+/;
-/** Bare page numbers / "Page 3 of 4" furniture — never policy content. */
+// Bare page numbers / "Page 3 of 4" furniture — never policy content.
 const PAGE_FURNITURE_PATTERN = /^(\d{1,3}|page\s+\d+(\s+of\s+\d+)?)$/i;
 
-/** Extracts a PDF's text in the browser (pdf.js) and reconstructs simple
- *  policy HTML from layout heuristics: larger lines become headings, bullet/
- *  numbered markers become lists, wrapped lines merge into paragraphs. The
- *  result seeds CKEditor as an editable draft — it's a starting point for
- *  the admin to clean up, not a faithful conversion. Scanned (image-only)
- *  PDFs have no text layer and are rejected. */
 export async function pdfToPolicyHtml(file: File): Promise<string> {
   const { getDocument, GlobalWorkerOptions } = await import('pdfjs-dist');
   GlobalWorkerOptions.workerSrc = new URL(
@@ -36,9 +28,6 @@ export async function pdfToPolicyHtml(file: File): Promise<string> {
   return documentToPolicyHtml(doc);
 }
 
-/** The parsing pipeline, separated from document opening so Node-based
- *  tests can drive it through pdf.js's legacy build (the main build is
- *  browser-only). */
 export async function documentToPolicyHtml(
   doc: PDFDocumentProxy,
 ): Promise<string> {

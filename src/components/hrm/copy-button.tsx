@@ -9,16 +9,11 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 type CopyButtonProps = {
-  /** The text written to the clipboard. */
   value: string;
-  /** What was copied, e.g. "email" — used for the toast and aria-label. */
   label?: string;
   className?: string;
 };
 
-/** Small ghost icon button that copies a value and briefly shows a check.
- *  Reused wherever a field should be one-click copyable (team directory,
- *  placeholder chips, etc.). */
 export function CopyButton({ value, label, className }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 

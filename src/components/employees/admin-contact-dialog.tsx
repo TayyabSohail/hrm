@@ -28,7 +28,6 @@ type AdminContactDialogProps = {
   defaultValues: ContactInfoInput;
 };
 
-/** Admin edit of an employee's contact fields on the profile page. */
 export function AdminContactDialog({
   employeeId,
   defaultValues,

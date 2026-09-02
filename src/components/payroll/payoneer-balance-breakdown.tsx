@@ -11,13 +11,11 @@ import { formatCurrency } from '@/utils/number-functions';
 
 import { type BalanceCurrency } from '@/constants/payroll-export';
 
-/** Foreign balances read naturally to the minor unit ($864.60); PKR doesn't. */
 const FX_DECIMAL_PLACES = 2;
 
 export type BalanceBreakdownGroup = {
   currency: BalanceCurrency;
   count: number;
-  /** What this group's employees receive, in PKR. */
   totalPkr: number;
 };
 
@@ -25,12 +23,6 @@ type PayoneerBalanceBreakdownProps = {
   groups: BalanceBreakdownGroup[];
 };
 
-/**
- * How much each Payoneer source balance is drawn down, shown in that balance's
- * own currency. The figures are an estimate at today's rate — the amount paid is
- * the frozen PKR payslip total, and Payoneer applies its own rate at send time.
- * Falls back to PKR when rates can't be fetched.
- */
 export function PayoneerBalanceBreakdown({
   groups,
 }: PayoneerBalanceBreakdownProps) {

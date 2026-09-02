@@ -9,16 +9,11 @@ type EditableNumberCellProps = {
   min?: number;
   max?: number;
   step?: number;
-  /** True while a recalc is in flight — the cell is frozen until it settles. */
   disabled?: boolean;
   ariaLabel: string;
   onCommit: (value: number) => void;
 };
 
-/** Inline numeric editor for the draft grid (days worked, OT multiplier). Edits
- *  are local until blur / Enter, so the server recalc fires once per committed
- *  change — not per keystroke. Value is clamped to [min, max]; committing an
- *  unchanged value is a no-op. */
 export function EditableNumberCell({
   value,
   min = 0,
@@ -39,7 +34,10 @@ export function EditableNumberCell({
       setDraft(String(value));
       return;
     }
-    const clamped = Math.max(min, max === undefined ? parsed : Math.min(max, parsed));
+    const clamped = Math.max(
+      min,
+      max === undefined ? parsed : Math.min(max, parsed),
+    );
     if (clamped === value) {
       setDraft(String(value)); // normalize a no-op edit back to the source
       return;

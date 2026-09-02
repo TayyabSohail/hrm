@@ -90,11 +90,6 @@ const styles = StyleSheet.create({
   },
 });
 
-/** Policy content is CKEditor-authored HTML with a small, known tag set
- *  (headings, paragraphs, bold/italic, links, lists). This maps it onto
- *  react-pdf primitives directly — no HTML-to-PDF dependency needed.
- *  Runs client-side only (DOMParser), which is fine: PDFs are generated
- *  in the browser on click. */
 function renderInline(node: ChildNode, key: number): React.ReactNode {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent;
   if (!(node instanceof HTMLElement)) return null;

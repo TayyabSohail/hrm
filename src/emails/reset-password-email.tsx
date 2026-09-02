@@ -4,25 +4,13 @@ import { EmailLayout } from '@/emails/components/email-layout';
 import { emailStyles } from '@/emails/theme';
 
 export type ResetPasswordEmailProps = {
-  /** Full name of the account holder, when known. */
   fullName?: string | null;
-  /** One-time link that lands on `/auth/reset-password` with the recovery token. */
   resetUrl: string;
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo (email clients can't load
-   *  SVG/relative assets). */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
 };
 
-/**
- * Sent when someone requests a password reset from the "Forgot password?" flow.
- * We deliver it ourselves through Resend (rather than Supabase's own mailer) so
- * the recovery link points at our branded `/auth/reset-password` flow and the
- * message reads as one system with the rest of the transactional emails.
- */
 export function ResetPasswordEmail({
   fullName,
   resetUrl,

@@ -12,8 +12,6 @@ export type PolicyUpdatedEmailProps = {
   supportEmail: string;
 };
 
-/** Sent after an admin publishes a new version of an existing policy. It
- * intentionally does not describe or compare the changes. */
 export function PolicyUpdatedEmail({
   fullName,
   policyTitle,

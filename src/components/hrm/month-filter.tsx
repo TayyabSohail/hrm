@@ -34,17 +34,10 @@ const MONTH_LABELS = [
 ];
 
 type MonthFilterProps = {
-  /** 'all', 'YYYY' (whole year), or 'YYYY-MM'. */
   value: string;
   onChange: (value: string) => void;
 };
 
-/** Month dropdown for filtering a request/claim/log history table. Renders
- *  a fixed 3x4 grid (future months disabled) plus an "All time" option, so
- *  the popover stays a constant size instead of growing into a long
- *  scrolling list. Year chevrons let you page back through history — years
- *  beyond the real current year are blocked, past years are unrestricted.
- *  Clicking the year label itself filters to that whole year. */
 export function MonthFilter({ value, onChange }: MonthFilterProps) {
   const [open, setOpen] = useState(false);
 

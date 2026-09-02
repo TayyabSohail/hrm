@@ -8,7 +8,6 @@ import { QueryKeys } from '@/constants/query-keys';
 
 import { type Tables } from '@/types/supabase';
 
-/** Private bucket holding Payoneer files at `<run_id>/salaries-mon-year.csv`. */
 export const PAYROLL_EXPORTS_BUCKET = 'payroll-exports';
 const SIGNED_URL_TTL_SECONDS = 60 * 5; // 5m — long enough to click through to a download
 
@@ -16,7 +15,6 @@ export type RunExport = {
   id: string;
   filePath: string;
   exportedAt: string;
-  /** Joined via the `exported_by → employees` FK; '' when the row predates it. */
   exportedByName: string;
 };
 
@@ -45,7 +43,6 @@ const fetchRunExports = authQuery(
   { paramsSchema: z.object({ runId: z.string() }) },
 );
 
-/** Export artifacts for one run (admin history drill-down). */
 export const useRunExports = (runId?: string) =>
   useQuery({
     queryKey: [QueryKeys.RUN_EXPORTS, runId],
@@ -53,9 +50,6 @@ export const useRunExports = (runId?: string) =>
     enabled: !!runId,
   });
 
-/** Mint a short-lived signed URL for one stored export file. Gated by the
- *  `payroll_exports_admin` storage policy (admins only). Used on click, so the
- *  URL is always fresh when the download starts. */
 export async function createExportSignedUrl(filePath: string) {
   const supabase = createSupabaseBrowserClient();
   const { data, error } = await supabase.storage

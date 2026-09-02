@@ -25,13 +25,10 @@ type ControlledDatePickerProps<TFieldValues extends FieldValues> = {
   name: FieldPath<TFieldValues>;
   label?: string;
   placeholder?: string;
-  /** Restrict selectable dates, e.g. { after: new Date() } disabled. */
   disabledDates?: React.ComponentProps<typeof Calendar>['disabled'];
   containerClassName?: string;
 };
 
-/** RHF-controlled date picker. Stores the value as an ISO date string
- *  (yyyy-MM-dd) to stay serializable and schema-friendly. */
 export function ControlledDatePicker<TFieldValues extends FieldValues>({
   name,
   label,

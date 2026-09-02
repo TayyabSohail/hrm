@@ -37,7 +37,6 @@ type AdminSocialsDialogProps = {
   defaultValues: SocialAccountsInput;
 };
 
-/** Admin edit of an employee's social accounts on the profile page. */
 export function AdminSocialsDialog({
   employeeId,
   defaultValues,

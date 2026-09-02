@@ -1,7 +1,6 @@
 type PageHeaderProps = {
   title: string;
   description?: string;
-  /** Action slot (e.g. a "Request leave" button). */
   children?: React.ReactNode;
 };
 

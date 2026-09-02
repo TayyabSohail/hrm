@@ -8,13 +8,6 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { QueryKeys } from '@/constants/query-keys';
 import { type DocType } from '@/schema/onboarding';
 
-/**
- * Uploads an identity document to the private `identity-docs` bucket at
- * `<uid>/<doc_type>` (the leading uid segment is what the storage RLS policy
- * checks), then upserts the matching `employee_documents` row. `upsert: true`
- * on both the object and the row makes re-uploading idempotent — one object and
- * one row per doc_type, replaced rather than duplicated.
- */
 export function useUploadIdentityDoc(userId: string) {
   const supabase = createSupabaseBrowserClient();
   const queryClient = useQueryClient();

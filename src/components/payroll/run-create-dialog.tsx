@@ -24,11 +24,6 @@ import { firstAvailableMonth } from '@/utils/payroll-functions';
 
 import { paths } from '@/constants/paths';
 
-/** Create a run for any month that doesn't have one yet (current, back-dated, or
- *  future). `days_in_month` is derived server-side. Months with an existing run
- *  are disabled in the picker — `period_month` is unique, so creating one there
- *  would silently drop the admin on the old run instead. On success we navigate
- *  to the run's screen. */
 export function RunCreateDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);

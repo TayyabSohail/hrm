@@ -8,8 +8,6 @@ type ComingSoonProps = {
   description: string;
 };
 
-/** Placeholder for routes whose module slice hasn't been built yet, so no
- *  sidebar link ever 404s during the frontend-first phase. */
 export function ComingSoon({ title, description }: ComingSoonProps) {
   return (
     <>

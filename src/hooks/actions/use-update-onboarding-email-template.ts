@@ -9,9 +9,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Save the onboarding email template singleton (admin). On success, invalidate
- *  the template query so the editor and its live preview re-sync from the saved
- *  (sanitized) row and the form's dirty state clears. */
 export function useUpdateOnboardingEmailTemplate(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useAction(updateOnboardingEmailTemplate, {

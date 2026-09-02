@@ -13,18 +13,9 @@ type Decision = 'approved' | 'rejected';
 type MedicalReviewActionsProps = {
   itemId: string;
   employeeName: string;
-  /** Called after a committed decision so the parent can close the review
-   *  sheet. The queue refreshes via the mutation's own invalidation. */
   onReviewed: (decision: Decision) => void;
 };
 
-/**
- * Approve / reject controls for a single medical claim in the admin queue.
- * Backed by the real `reviewMedicalClaim` action, which re-derives the balance
- * and rejects an over-balance approval server-side — that error surfaces here as
- * a toast (the claim stays pending). Rejection reuses the shared
- * `RejectRequestDialog` for the required reason.
- */
 export function MedicalReviewActions({
   itemId,
   employeeName,

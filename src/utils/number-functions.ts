@@ -3,8 +3,6 @@ import { appConfig } from '@/config/app';
 export const formatCurrency = (
   amount?: number | null,
   decimalPlaces?: number,
-  /** ISO-4217 code — defaults to the app's own currency. Pass this only to show
-   *  a genuinely foreign amount (e.g. a Payoneer source balance in USD). */
   currency: string = appConfig.defaultCurrency,
 ) => {
   if (!amount) return '';

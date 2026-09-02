@@ -10,12 +10,7 @@ import { StatCard } from '@/components/hrm/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type LeaveBalanceCardsProps = {
-  /** Whose balance to show. Undefined on the self page until the signed-in
-   *  identity resolves — the cards render a skeleton until it does. */
   employeeId?: string;
-  /** 'all' | 'YYYY' | 'YYYY-MM' — the period selected by the page-level
-   *  month filter. Pool usage is always summed per-year regardless of
-   *  month, since the pool itself resets annually. */
   month: string;
 };
 

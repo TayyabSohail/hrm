@@ -36,7 +36,6 @@ type SocialsInfoDialogProps = {
   defaultValues: SocialAccountsInput;
 };
 
-/** Employees self-edit their own social accounts (PRD 3.1). */
 export function SocialsInfoDialog({ defaultValues }: SocialsInfoDialogProps) {
   const [open, setOpen] = useState(false);
 

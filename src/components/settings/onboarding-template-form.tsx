@@ -35,10 +35,6 @@ import {
 
 import { OnboardingEmailTemplate } from '@/types/hrm';
 
-/** The single invitation email, edited here and reused for every invite
- *  (PRD §6.4). Backed by the `onboarding_email_template` singleton: the body is
- *  sanitized server-side on save, and the invite flow renders the tokens per
- *  recipient. The preview on the right shows them filled with sample values. */
 export function OnboardingTemplateForm() {
   const { data: template, isLoading } = useOnboardingEmailTemplate();
 

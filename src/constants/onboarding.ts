@@ -17,10 +17,6 @@ export const onboardingSteps = [
   'Consent',
 ] as const;
 
-/** Section 1 text inputs, in display order. Date of birth is rendered as a
- *  separate picker (after the first field), so it isn't listed here. Phone and
- *  emergency contact accept digits only; CNIC auto-inserts its dashes; the
- *  address is split into street / city / postal code. */
 export const personalInfoFields: TextFieldConfig<
   Exclude<keyof PersonalInfoInput, 'dateOfBirth'>
 >[] = [
@@ -66,8 +62,6 @@ export const personalInfoFields: TextFieldConfig<
   },
 ];
 
-/** Section 2 bank fields, in display order. Account number accepts digits
- *  only. */
 export const bankInfoFields: TextFieldConfig<keyof BankInfoInput>[] = [
   { name: 'bankName', label: 'Bank name', placeholder: 'e.g. Meezan Bank' },
   {
@@ -95,9 +89,6 @@ export const bankInfoFields: TextFieldConfig<keyof BankInfoInput>[] = [
   },
 ];
 
-/** Identity-document upload constraints (section 4). Files are restricted to
- *  PNG or PDF and capped at {@link IDENTITY_DOC_MAX_SIZE_MB}MB — enforced both
- *  by the native picker (`accept`) and by `FileUpload`'s own validation. */
 export const IDENTITY_DOC_MIME_TYPES = [
   'image/png',
   'application/pdf',
@@ -106,7 +97,6 @@ export const IDENTITY_DOC_ACCEPT = IDENTITY_DOC_MIME_TYPES.join(',');
 export const IDENTITY_DOC_MAX_SIZE_MB = 5;
 export const IDENTITY_DOC_HINT = 'PNG or PDF · up to 5MB';
 
-/** Section 3 social account fields, in display order. */
 export const socialAccountsFields: {
   name: keyof SocialAccountsInput;
   label: string;
@@ -129,9 +119,6 @@ export const socialAccountsFields: {
   },
 ];
 
-/** The three identity documents collected in section 4, in display order. Each
- *  `docType` keys both the storage path (`<uid>/<doc_type>`) and the
- *  `employee_documents` unique constraint. */
 export const identityDocuments: { docType: DocType; label: string }[] = [
   { docType: 'cnic_front', label: 'Front of CNIC' },
   { docType: 'cnic_back', label: 'Back of CNIC' },

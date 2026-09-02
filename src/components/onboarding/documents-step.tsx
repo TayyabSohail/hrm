@@ -28,13 +28,6 @@ type DocumentsStepProps = {
   onBack: () => void;
 };
 
-/**
- * Section 4 · Identity documents. Each file uploads immediately to
- * `identity-docs` at `<uid>/<doc_type>` and upserts one `employee_documents`
- * row — re-selecting a file replaces it. Only PNG or PDF up to
- * {@link IDENTITY_DOC_MAX_SIZE_MB}MB are accepted, and each uploaded file shows
- * a preview. Continue unlocks once all three types are present.
- */
 export function DocumentsStep({ userId, onNext, onBack }: DocumentsStepProps) {
   const { data: documents } = useEmployeeDocuments(userId);
   const { data: docFiles, isLoading: filesLoading } =

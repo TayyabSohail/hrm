@@ -39,14 +39,10 @@ import {
 
 type BulkAdjustmentDialogProps = {
   runId: string;
-  /** The selected rows. One action call fans out across all of them. */
   payslipIds: string[];
-  /** The toolbar button decides the sign, keeping adjustment and deduction
-   *  actions explicit instead of making the admin choose it again in a modal. */
   kind: PayslipLineItemKind;
 };
 
-/** Adds the same adjustment or deduction to every selected employee at once. */
 export function BulkAdjustmentDialog({
   runId,
   payslipIds,

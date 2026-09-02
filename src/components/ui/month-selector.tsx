@@ -115,7 +115,6 @@ export function MonthSelector({
       </PopoverTrigger>
       <PopoverContent className='w-80 p-0' align='start'>
         <div className='p-4'>
-          {/* Year navigation */}
           <div className='mb-4 flex items-center justify-between'>
             <Button
               variant='outline'
@@ -138,7 +137,6 @@ export function MonthSelector({
             </Button>
           </div>
 
-          {/* Month grid */}
           <div className='grid grid-cols-3 gap-2'>
             {months.map((month, index) => {
               const isSelected =

@@ -12,9 +12,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { getInitials } from '@/lib/team';
 
-/** Sidebar identity for the signed-in user. Purely informational — it replaced
- *  the dev-only role switcher, so there is no way to cross into the other
- *  role's app from here (real auth + the middleware role funnel decide that). */
 export function UserCard() {
   const { data: employee, isLoading } = useCurrentEmployee();
   const { data: authUser } = useUser();

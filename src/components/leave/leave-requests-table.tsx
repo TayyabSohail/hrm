@@ -91,15 +91,10 @@ type LeaveRequestsTableProps = {
   requests: LeaveRequest[] | undefined;
   isLoading: boolean;
   emptyDescription?: string;
-  /** Optional heading, e.g. "Recent Requests". */
   title?: string;
-  /** 'all' | 'YYYY' | 'YYYY-MM' — the period selected by the page-level
-   *  month filter. */
   month: string;
 };
 
-/** Presentational leave table — used by both the employee's own /leave
- *  page and the admin's per-employee view. */
 export function LeaveRequestsTable({
   requests,
   isLoading,

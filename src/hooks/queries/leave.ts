@@ -8,9 +8,6 @@ import { QueryKeys } from '@/constants/query-keys';
 import { LeaveRequest } from '@/types/hrm';
 import { type Tables } from '@/types/supabase';
 
-/** Map a `leave_requests` row onto the `LeaveRequest` domain type. The admin
- *  queue passes the joined employee name; self/per-employee reads leave it '' —
- *  those surfaces don't render it. */
 export function toLeaveRequest(
   row: Tables<'leave_requests'>,
   employeeName = '',

@@ -4,29 +4,16 @@ import { EmailLayout } from '@/emails/components/email-layout';
 import { brand, emailStyles } from '@/emails/theme';
 
 export type OvertimeSubmittedEmailProps = {
-  /** Full name of the admin recipient, when known. */
   adminName?: string | null;
-  /** Name of the employee who logged the overtime (falls back to their email). */
   employeeName: string;
-  /** Human-readable one-liner, e.g. "3 hr(s) · HRM Frontend". */
   summary: string;
-  /** What the employee worked on during the overtime. */
   task: string;
-  /** Deep link to the admin approvals queue. */
   reviewUrl: string;
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo. */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
 };
 
-/**
- * Sent to every active admin when an employee logs overtime. Mirrors
- * `LeaveSubmittedEmail` — the CTA drops the admin onto the approvals queue where
- * they can approve or reject. Only approved hours ever feed payroll.
- */
 export function OvertimeSubmittedEmail({
   adminName,
   employeeName,
@@ -72,8 +59,8 @@ export function OvertimeSubmittedEmail({
         </Section>
 
         <Text style={emailStyles.paragraph}>
-          Review the log, then approve or reject it from the queue. Only approved
-          hours are paid out.
+          Review the log, then approve or reject it from the queue. Only
+          approved hours are paid out.
         </Text>
 
         <Section style={emailStyles.buttonWrap}>

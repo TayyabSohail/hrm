@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { useUpdatePayrollSettings } from '@/hooks/actions/use-update-payroll-settings';
 import { useHrmSettings } from '@/hooks/queries/settings';
 
-import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -35,9 +35,6 @@ import { UnitInput } from './unit-input';
 
 import type { HrmSettings } from '@/types/hrm';
 
-/** Every numeric HRM rule — leave, medical, payroll — edited in one card so
- *  the Configuration tab reads as a single console instead of scattered
- *  boxes. Saves all values in one pass to the settings cache. */
 export function HrmSettingsForm() {
   const { data: settings, isLoading } = useHrmSettings();
 

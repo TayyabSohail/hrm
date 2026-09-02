@@ -13,17 +13,9 @@ type Decision = 'approved' | 'rejected';
 type LeaveReviewActionsProps = {
   itemId: string;
   employeeName: string;
-  /** Called after a committed decision so the parent can close the review
-   *  sheet. The queue refreshes via the mutation's own invalidation. */
   onReviewed: (decision: Decision) => void;
 };
 
-/**
- * Approve / reject controls for a single leave request in the admin queue.
- * Backed by the real `reviewLeaveRequest` action (stamps status/reviewer,
- * updates the balance, emails the employee). Rejection reuses the shared
- * `RejectRequestDialog` for the required reason.
- */
 export function LeaveReviewActions({
   itemId,
   employeeName,

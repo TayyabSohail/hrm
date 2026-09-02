@@ -18,7 +18,6 @@ import {
 } from '@/schema/onboarding';
 
 type PersonalInfoStepProps = {
-  /** Set at invite time and not editable here — shown read-only for reference. */
   email: string;
   defaultValues: PersonalInfoInput;
   onNext: (values: PersonalInfoInput) => void | Promise<void>;

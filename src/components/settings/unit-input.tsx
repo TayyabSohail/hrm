@@ -5,13 +5,9 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 type UnitInputProps = React.ComponentProps<'input'> & {
-  /** Trailing adornment, e.g. "days", "PKR", "%", "×". */
   unit: string;
 };
 
-/** A numeric field with its unit pinned inside the trailing edge and the
- *  value right-aligned, so a column of settings reads like a console
- *  readout rather than a stack of blank boxes. */
 export const UnitInput = React.forwardRef<HTMLInputElement, UnitInputProps>(
   ({ unit, className, ...props }, ref) => (
     <div className='relative'>

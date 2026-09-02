@@ -4,7 +4,6 @@ type EmptyStateProps = {
   title: string;
   description?: string;
   icon?: LucideIcon;
-  /** Optional CTA, e.g. a "Request leave" button. */
   children?: React.ReactNode;
 };
 

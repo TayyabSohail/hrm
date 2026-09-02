@@ -9,7 +9,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Set or clear an inline days-worked override and recalc the run (admin). */
 export function useOverrideDaysWorked(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useAction(overrideDaysWorked, {

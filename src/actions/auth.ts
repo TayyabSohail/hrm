@@ -13,8 +13,6 @@ import {
   resetPasswordSchema,
 } from '@/schema/auth';
 
-/** Email + password sign-in. The Supabase server client writes the session
- *  cookies; the caller refreshes to pick them up and routes into the app. */
 export const signInWithPassword = safeActionClient
   .schema(loginSchema)
   .action(async ({ parsedInput: { email, password } }) => {
@@ -23,7 +21,7 @@ export const signInWithPassword = safeActionClient
       email: email.trim().toLowerCase(),
       password,
     });
-    // Uniform message — never reveal whether it was the email or the password.
+    // Uniform message — never reveal whether the email or the password was wrong.
     if (error) {
       const { data: employee } = await supabaseAdmin
         .from('employees')
@@ -37,39 +35,19 @@ export const signInWithPassword = safeActionClient
       }
       throw new Error('Invalid email or password');
     }
-    // Role decides which app the caller lands in (mirrored into app_metadata
-    // from employees.role). The middleware enforces the same split on every
-    // subsequent request.
+    // Role decides which app the caller lands in; the middleware enforces the
+    // same split on every subsequent request.
     const isAdmin = data.user?.app_metadata?.role === 'admin';
     return { role: isAdmin ? ('admin' as const) : ('employee' as const) };
   });
 
-/**
- * Sends a password-recovery email, or reports that no account exists for the
- * address. The result is a discriminated status the "Forgot password?" screen
- * renders as one of two cards: `not_found` (no matching account) or `sent`.
- *
- * Delivered through Resend, not Supabase's own mailer — mirroring the invite
- * flow (`inviteEmployee` / `sendInviteEmail`). We mint the recovery link with
- * the service-role admin API (`generateLink`), which returns a one-time
- * `hashed_token` without triggering Supabase's unbranded mailer, then point it
- * at `/auth/reset-password?token_hash=…&type=recovery` and send our own branded
- * template. The reset page exchanges that token for a recovery session via
- * `verifyOtp` on arrival (see `RecoveryTokenVerifier`).
- *
- * Note: reporting `not_found` intentionally reveals whether an email is
- * registered (an account-enumeration surface) — a deliberate product choice for
- * clearer UX over the anti-enumeration "if an account exists" phrasing.
- */
 export const requestPasswordReset = safeActionClient
   .schema(forgotPasswordSchema)
   .action(async ({ parsedInput: { email } }) => {
-    // Match how Supabase auth stores emails (lower-cased) so the lookup resolves
-    // the account reliably.
     const normalizedEmail = email.trim().toLowerCase();
 
-    // `employees` is the app's source of truth for who has an account (every
-    // auth user is created with a paired row), so it decides send vs not-found.
+    // Every auth user is created with a paired row, so `employees` decides
+    // send vs not-found.
     const { data: employee, error: lookupError } = await supabaseAdmin
       .from('employees')
       .select('full_name, account_status')
@@ -81,15 +59,12 @@ export const requestPasswordReset = safeActionClient
     if (!employee) {
       return { status: 'not_found' as const };
     }
+    // A reset must not become a recovery path for an account that intentionally
+    // lost access. Re-enabling restores this route.
     if (employee.account_status === 'disabled') {
-      // A reset must not become a misleading recovery path for an account that
-      // has intentionally lost access. Re-enabling restores this route.
       return { status: 'disabled' as const };
     }
 
-    // Mint the one-time recovery link (no Supabase mailer is triggered) and
-    // deliver our branded template. A failure now surfaces to the caller — with
-    // enumeration protection dropped, there's no reason to hide a real outage.
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: normalizedEmail,
@@ -111,7 +86,6 @@ export const requestPasswordReset = safeActionClient
     return { status: 'sent' as const };
   });
 
-/** Sets a new password for the user in the current (recovery) session. */
 export const updatePassword = authActionClient
   .schema(resetPasswordSchema)
   .action(async ({ parsedInput: { password }, ctx: { supabase } }) => {
@@ -123,7 +97,6 @@ export const updatePassword = authActionClient
     }
   });
 
-/** Clears the session cookies. The caller routes back to /auth/login. */
 export const signOut = authActionClient.action(
   async ({ ctx: { supabase } }) => {
     await supabase.auth.signOut();

@@ -1,10 +1,9 @@
 const normalizeText = (text: string) => text.trim().replace(/\s+/g, ' ');
 
-/** Classes stamped onto changed blocks in the employee-facing diff view. */
 export const POLICY_DIFF_ADDED_CLASS = 'policy-diff-added';
 export const POLICY_DIFF_REMOVED_CLASS = 'policy-diff-removed';
 
-/** @deprecated Use POLICY_DIFF_ADDED_CLASS or POLICY_DIFF_REMOVED_CLASS. */
+// @deprecated Use POLICY_DIFF_ADDED_CLASS or POLICY_DIFF_REMOVED_CLASS.
 export const POLICY_DIFF_HIGHLIGHT_CLASS = POLICY_DIFF_ADDED_CLASS;
 
 type DiffBlock = {
@@ -218,9 +217,6 @@ function buildEditOperations(oldBlocks: DiffBlock[], newBlocks: DiffBlock[]) {
   return operations;
 }
 
-/** CKEditor stores Shift+Enter/new-line content within the same list item or
- * paragraph as `<br>`. Splitting those lines lets a one-line edit stay a
- * one-line diff instead of replacing the entire parent block. */
 function getTextLines(element: Element): TextLine[] {
   const html = element.innerHTML;
   const lines = html.split(/<br\b[^>]*>/i).map((lineHtml) => ({
@@ -348,8 +344,6 @@ function buildLineEditOperations(
 const wrapLine = (className: string, html: string) =>
   `<span class="${className}">${html}</span>`;
 
-/** Returns the number of changed inner lines when both blocks use line breaks,
- * otherwise `null` so callers can keep the normal whole-block behavior. */
 function getLineDiffOperationCount(
   oldBlock: DiffBlock,
   newBlock: DiffBlock,
@@ -367,9 +361,6 @@ function getLineDiffOperationCount(
   ).length;
 }
 
-/** Refines a replaced list item/paragraph into line-level changes. This avoids
- * falsely rendering every existing line as removed and re-added when only one
- * `<br>`-separated line changes. */
 function highlightChangedLines(oldBlock: DiffBlock, newBlock: DiffBlock) {
   if (oldBlock.element.tagName !== newBlock.element.tagName) return false;
   if (!hasLineBreak(oldBlock.element) && !hasLineBreak(newBlock.element)) {

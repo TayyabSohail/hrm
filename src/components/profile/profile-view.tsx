@@ -22,23 +22,11 @@ import { formatDate } from '@/utils/date-functions';
 import { employmentTypeLabels } from '@/constants/hrm-labels';
 
 type ProfileViewProps = {
-  /** Employment (salary/designation/type) is admin-owned and only meaningful
-   *  for employees. Admins have no employment record, so their own profile
-   *  hides that section and uses a role-neutral header. Defaults to the full
-   *  employee view. */
   showEmployment?: boolean;
-  /** Personal identity fields (name / DOB / CNIC) are admin-managed, so an
-   *  employee's own profile shows them read-only. Admins have no admin above
-   *  them, so their profile enables self-editing. Defaults to read-only. */
   canEditPersonal?: boolean;
-  /** Identity documents are collected during onboarding, which admins never go
-   *  through — so their profile omits the documents card. Defaults to shown. */
   showDocuments?: boolean;
 };
 
-/** Self-service profile: the signed-in user views their own data and edits
- *  contact, bank, and socials. Employment stays read-only (admin-owned), and
- *  personal identity fields are editable only for admins (see props). */
 export function ProfileView({
   showEmployment = true,
   canEditPersonal = false,

@@ -9,16 +9,11 @@ import { Button } from '@/components/ui/button';
 import { pdfToPolicyHtml } from '@/lib/pdf-to-html';
 
 type ImportPdfButtonProps = {
-  /** Receives the extracted HTML and the source file name (without
-   *  extension) — the caller decides where it lands. */
   onImported: (html: string, fileName: string) => void;
   size?: 'default' | 'sm';
   className?: string;
 };
 
-/** Extracts a text-based PDF into editable policy HTML. The result is a
- *  draft for the admin to clean up in the editor — headings, lists, and
- *  paragraphs are reconstructed heuristically from the PDF's layout. */
 export function ImportPdfButton({
   onImported,
   size = 'default',

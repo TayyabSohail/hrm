@@ -121,8 +121,6 @@ type MedicalClaimsTableProps = {
   isLoading: boolean;
   emptyDescription?: string;
   title?: string;
-  /** 'all' | 'YYYY' | 'YYYY-MM' — the period selected by the page-level
-   *  month filter. */
   month: string;
 };
 

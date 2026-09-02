@@ -58,10 +58,7 @@ export function DataTablePagination({
       )}
     >
       {showSelected && (
-        <div className='text-sm text-muted-foreground md:mr-auto'>
-          {/* Placeholder for selected rows count */}
-          {/* {selectedRowsCount} of {totalCount} row(s) selected. */}
-        </div>
+        <div className='text-sm text-muted-foreground md:mr-auto'></div>
       )}
       <div className='flex flex-wrap items-center justify-between gap-2 sm:justify-start md:gap-4'>
         <div className='flex items-center space-x-2'>

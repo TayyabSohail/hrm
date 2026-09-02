@@ -15,8 +15,6 @@ import { Payslip } from '@/types/hrm';
 type DownloadPayslipButtonProps = {
   payslip: Payslip;
   className?: string;
-  /** Renders as a bare ghost icon button (for a dense table row) instead of
-   *  the full-width labeled button used in a detail sheet footer. */
   iconOnly?: boolean;
 };
 

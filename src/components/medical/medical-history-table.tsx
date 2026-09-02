@@ -5,9 +5,6 @@ import { useMedicalClaims } from '@/hooks/queries/medical';
 import { MedicalClaimsTable } from './medical-claims-table';
 
 type MedicalHistoryTableProps = {
-  /** The signed-in employee's id. Undefined until the identity resolves — the
-   *  table shows a skeleton until then. Sharing this id-keyed query with the
-   *  balance widget means the page fetches the rows once. */
   employeeId?: string;
   month: string;
 };

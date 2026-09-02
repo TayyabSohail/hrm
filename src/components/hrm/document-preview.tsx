@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 
 type DocumentPreviewProps = {
   file?: IdentityDocFile;
-  /** Accessible label / alt text for the document. */
   label: string;
   isLoading?: boolean;
   className?: string;
@@ -23,15 +22,6 @@ type DocumentPreviewProps = {
 const FRAME =
   'relative flex h-56 w-full items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/30';
 
-/**
- * Shows an uploaded identity document fitted whole into a fixed frame — no
- * cropping, no scrolling. The frame is rendered up-front and a skeleton fills it
- * until the media has actually decoded (not just until the query resolved), so
- * it never flashes borderless → bordered → empty → image. Images render with
- * object-contain; PDFs embed the first page fitted with the viewer chrome
- * hidden. Either way the same "Open" affordance opens the full document in a new
- * tab. Renders nothing until there's something to show.
- */
 export function DocumentPreview({
   file,
   label,

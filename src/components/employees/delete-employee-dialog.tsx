@@ -25,7 +25,7 @@ type EmployeeAccessDialogProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-/** A deliberate confirmation around a reversible employee access change. */
+// A deliberate confirmation around a reversible employee access change.
 export function EmployeeAccessDialog({
   employeeId,
   employeeName,

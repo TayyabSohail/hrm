@@ -22,9 +22,6 @@ const fetchOnboardingEmailTemplate = authQuery(async ({ supabase }) => {
   } satisfies OnboardingEmailTemplate;
 });
 
-/** The one reusable invitation email (PRD §6.4), backed by the
- *  `onboarding_email_template` singleton. Saving invalidates this key (see
- *  `use-update-onboarding-email-template`). */
 export const useOnboardingEmailTemplate = () =>
   useQuery({
     queryKey: [QueryKeys.ONBOARDING_EMAIL_TEMPLATE],

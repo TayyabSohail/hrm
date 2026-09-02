@@ -9,7 +9,6 @@ import { QueryKeys } from '@/constants/query-keys';
 import { ContractVersion, EmployeeContract } from '@/types/hrm';
 import { type Tables } from '@/types/supabase';
 
-/** Private bucket holding contract PDFs at `<employee_id>/<uuid>.pdf`. */
 export const CONTRACTS_BUCKET = 'contracts';
 const SIGNED_URL_TTL_SECONDS = 60 * 60; // 1h — long enough to read a contract
 
@@ -29,14 +28,9 @@ const toVersion = (row: ContractRow) =>
     uploadedAt: row.uploaded_at,
   }) satisfies ContractVersion;
 
-/** Oldest first — the `EmployeeContract.versions` contract every consumer
- *  relies on (the last entry is the current version). */
 const byVersionAscending = (a: ContractVersion, b: ContractVersion) =>
   a.version - b.version;
 
-/** Admin history: every version for one employee. Only admins can read past
- *  versions (`contracts_select_own` exposes just the active row), so this
- *  returns a single entry when a non-admin somehow calls it. */
 const fetchEmployeeContract = authQuery(
   async ({ supabase, params }): Promise<EmployeeContract | null> => {
     const { data, error } = await supabase
@@ -54,10 +48,6 @@ const fetchEmployeeContract = authQuery(
   { paramsSchema: z.object({ employeeId: z.string().uuid() }) },
 );
 
-/** The signed-in employee's own contract — the active version and nothing
- *  else. The `is_active` filter is redundant under `contracts_select_own` but
- *  matters for an admin viewing their own contract, whose RLS policy exposes
- *  the whole history. */
 const fetchMyContract = authQuery(
   async ({ supabase, user }): Promise<EmployeeContract | null> => {
     const { data, error } = await supabase
@@ -86,9 +76,6 @@ export const useMyContract = () =>
     queryFn: () => fetchMyContract(),
   });
 
-/** Short-lived signed URLs for contract PDFs, keyed by storage path. The
- *  bucket is private, so the contractdocs_own / contractdocs_admin storage RLS
- *  gates access — an owner gets their own file, an admin gets any. */
 export const useContractFileUrls = (paths: string[]) =>
   useQuery({
     queryKey: [QueryKeys.CONTRACT_FILE_URLS, paths],
@@ -115,7 +102,5 @@ export const useContractFileUrls = (paths: string[]) =>
     },
   });
 
-/** The version an employee is currently on — the last entry, by construction
- *  of `versions` (oldest first). */
 export const currentContractVersion = (contract: EmployeeContract) =>
   contract.versions[contract.versions.length - 1];

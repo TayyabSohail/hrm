@@ -27,22 +27,11 @@ import {
   updatePayrollSettingsSchema,
 } from '@/schema/payroll';
 
-/** Admin gate. The role check is server-side even though RLS / the RPC's own
- *  `is_admin()` guard also enforce it (mirrors `actions/overtime.ts`). */
+// Defense in depth: RLS and each RPC's own `is_admin()` guard enforce the same thing at the database.
 const requireAdmin = (role?: string) => {
   if (role !== 'admin') throw new Error('Forbidden');
 };
 
-/**
- * Mail each listed payslip to its employee as a PDF invoice, and report how many
- * landed. Runs service-role (`supabaseAdmin`) to read employee emails alongside
- * the payslip figures in one query.
- *
- * Every payslip is rendered and sent independently (`allSettled`), so one
- * missing address or one unrenderable PDF can't take the rest of a run's
- * invoices down with it. The figures are read back from the DB rather than
- * accepted from the caller, so a client can never mail a doctored payslip.
- */
 async function dispatchInvoices(payslipIds: string[]) {
   if (payslipIds.length === 0) return { sent: 0, failed: 0 };
 
@@ -75,73 +64,55 @@ async function dispatchInvoices(payslipIds: string[]) {
     }),
   );
 
-  // Update DB per-recipient so UI can surface sent/failed statuses.
-  let sent = 0;
-  let failed = 0;
-  for (let i = 0; i < (rows ?? []).length; i += 1) {
-    const row = (rows ?? [])[i];
-    const res = results[i];
-    try {
-      if (res.status === 'fulfilled') {
-        sent += 1;
-        const { error: updateErr } = await supabaseAdmin
+  // Stamp each payslip so the UI can surface per-row sent/failed status.
+  const statusWrites = await Promise.allSettled(
+    (rows ?? []).map((row, index) => {
+      const result = results[index];
+      const attempts = (row.notification_attempts ?? 0) + 1;
+
+      if (result.status === 'fulfilled') {
+        return supabaseAdmin
           .from('payslips')
           .update({
             notification_status: 'sent',
             notification_sent_at: new Date().toISOString(),
-            notification_attempts: (row.notification_attempts ?? 0) + 1,
+            notification_attempts: attempts,
             notification_last_error: null,
           })
           .eq('id', row.id);
-        if (updateErr)
-          Logger.error(
-            'Failed to update payslip notification status',
-            updateErr.message,
-          );
-      } else {
-        failed += 1;
-        const errorText = (res as PromiseRejectedResult).reason?.message
-          ? String((res as PromiseRejectedResult).reason?.message)
-          : 'Unknown error';
-        const { error: updateErr } = await supabaseAdmin
-          .from('payslips')
-          .update({
-            notification_status: 'failed',
-            notification_attempts: (row.notification_attempts ?? 0) + 1,
-            notification_last_error: errorText.slice(0, 1024),
-          })
-          .eq('id', row.id);
-        if (updateErr)
-          Logger.error(
-            'Failed to update payslip notification status',
-            updateErr.message,
-          );
       }
-    } catch (e) {
-      Logger.error('Error updating payslip notification status', e);
-    }
-  }
 
-  const failures = results.filter((r) => r.status === 'rejected');
-  failures.forEach((failure) =>
-    Logger.error('Failed to send invoice email', failure),
+      Logger.error('Failed to send invoice email', result.reason);
+      return supabaseAdmin
+        .from('payslips')
+        .update({
+          notification_status: 'failed',
+          notification_attempts: attempts,
+          notification_last_error: String(
+            result.reason?.message ?? 'Unknown error',
+          ).slice(0, 1024),
+        })
+        .eq('id', row.id);
+    }),
   );
 
-  return { sent, failed };
+  statusWrites.forEach((write) => {
+    const error =
+      write.status === 'rejected' ? write.reason : write.value.error;
+    if (error)
+      Logger.error('Failed to update payslip notification status', error);
+  });
+
+  const sent = results.filter((r) => r.status === 'fulfilled').length;
+  return { sent, failed: results.length - sent };
 }
 
-/** Last calendar day of the month a first-of-month ISO date falls in. Derived
- *  server-side so a client can never spoof `days_in_month` (it drives proration). */
+// Derived server-side so a client can never spoof `days_in_month`, which drives proration.
 const daysInMonth = (periodMonth: string) => {
   const [year, month] = periodMonth.split('-').map(Number);
   return new Date(year, month, 0).getDate();
 };
 
-/**
- * Update the single `payroll_settings` row. Admin-only. The row is seeded by the
- * migration and only ever UPDATEd (RLS `settings_write`), so this maps the
- * submitted camelCase subset onto the DB columns and writes just those keys.
- */
 export const updatePayrollSettings = authActionClient
   .schema(updatePayrollSettingsSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -167,9 +138,8 @@ export const updatePayrollSettings = authActionClient
       .eq('id', true);
     if (error) throw new Error(error.message);
 
-    // Employees with null allowance fields automatically inherit the global
-    // settings above. An admin can instead explicitly replace every employee's
-    // per-employee allowances with these values.
+    // A null per-employee allowance inherits the global setting above; scope
+    // 'all' instead stamps these values onto every employee.
     let employeesUpdated = 0;
     if (employeeScope === 'all') {
       if (
@@ -209,12 +179,6 @@ export const updatePayrollSettings = authActionClient
     return { updated: Object.keys(patch), employeesUpdated, employeeScope };
   });
 
-/**
- * Create an `open` run for a month (the manual "Create run" button — used for
- * the current, a back-dated, or a future month). `days_in_month` is derived
- * server-side. `period_month` is unique, so a duplicate create resolves to the
- * existing run rather than erroring.
- */
 export const createRun = authActionClient
   .schema(createRunSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -230,8 +194,8 @@ export const createRun = authActionClient
       .select('id, period_month')
       .single();
 
-    // Unique(period_month) violation → the run already exists; return it so the
-    // caller can just navigate to it (create is idempotent from the UI's view).
+    // Unique(period_month) — the run exists; return it so create stays
+    // idempotent from the UI's view.
     if (error) {
       if (error.code === '23505') {
         const { data: existing, error: fetchError } = await supabase
@@ -248,11 +212,6 @@ export const createRun = authActionClient
     return data;
   });
 
-/**
- * Generate / recalculate the draft payslips for a run. Idempotent; the RPC
- * refuses on a locked run (55000) and re-asserts admin (42501). Admin-guarded
- * here too for a fast, friendly failure before the round-trip.
- */
 export const calculatePayroll = authActionClient
   .schema(runIdSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -264,15 +223,6 @@ export const calculatePayroll = authActionClient
     return { run_id: parsedInput.run_id };
   });
 
-/**
- * Finalize a run: sweep-stamp approved medical/OT, freeze `total_payroll`, flip
- * to `locked`. The RPC is transactional and refuses a second lock (55000).
- *
- * Locking is what makes the figures final and the payslips visible to employees
- * under RLS. It deliberately mails nothing: sending payslip notifications is a
- * separate, explicit step (`sendRunInvoices`, the "Send notifications" button on
- * a locked run), so an admin decides exactly when employees are emailed.
- */
 export const lockPayroll = authActionClient
   .schema(runIdSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -284,11 +234,6 @@ export const lockPayroll = authActionClient
     return { run_id: parsedInput.run_id };
   });
 
-/**
- * Reopen and atomically recalculate a locked run. The RPC releases swept items,
- * clears lock metadata, refreshes payslips from current employee configuration,
- * and refuses a run that is not locked (55000).
- */
 export const unlockPayroll = authActionClient
   .schema(runIdSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -300,14 +245,6 @@ export const unlockPayroll = authActionClient
     return { run_id: parsedInput.run_id };
   });
 
-/**
- * Mail every payslip in a locked run to its employee — the "Send notifications"
- * button. Finalizing no longer emails anyone, so this is the explicit fan-out;
- * clicking it again re-sends to everyone (there is no per-employee sent flag).
- * Refused until the run is locked: the figures aren't final before that, and
- * employees can't see the payslips under RLS either. Reports the same
- * `{ sent, failed }` tally as the per-row send, via `dispatchInvoices`.
- */
 export const sendRunInvoices = authActionClient
   .schema(runIdSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -332,15 +269,6 @@ export const sendRunInvoices = authActionClient
     return { run_id: parsedInput.run_id, invoices };
   });
 
-/**
- * Mail one payslip's invoice to its employee — the per-row Send button, i.e. a
- * single-row send/re-send of what "Send notifications" (`sendRunInvoices`) fans
- * out to the whole run. Refused until the run is locked: the figures aren't
- * final before that, and the employee can't see the payslip under RLS either.
- *
- * Unlike the batch fan-out, a failure here IS the outcome of the click, so it
- * throws rather than being logged and swallowed.
- */
 export const sendPayslipInvoice = authActionClient
   .schema(sendInvoiceSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -364,10 +292,6 @@ export const sendPayslipInvoice = authActionClient
     return { payslip_id: payslip.id };
   });
 
-/**
- * Set or clear an inline days-worked override on one payslip, then recalc the
- * run so dependent totals refresh. Refused on a locked run before any write.
- */
 export const overrideDaysWorked = authActionClient
   .schema(overrideDaysWorkedSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -396,10 +320,6 @@ export const overrideDaysWorked = authActionClient
     return { run_id: payslip.payroll_run_id };
   });
 
-/**
- * Set or clear a per-payslip overtime-multiplier override on one or many
- * payslips, then recalc once. Refused on a locked run before any write.
- */
 export const overrideOtMultiplier = authActionClient
   .schema(overrideOtMultiplierSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -431,16 +351,6 @@ export const overrideOtMultiplier = authActionClient
     return { run_id: parsedInput.run_id };
   });
 
-/**
- * Set (or clear) an inline overtime-hours override on one payslip, then recalc
- * the run so OT pay, tax and net refresh. Refused on a locked run before any
- * write.
- *
- * Writes the sidecar `overtime_hours_override` column rather than
- * `overtime_hours` itself: the latter is recomputed from the approved overtime
- * logs on every recalc, so a direct write would be wiped by the very recalc
- * below. A `null` clears the override and hands the hours back to those logs.
- */
 export const overrideOtHours = authActionClient
   .schema(overrideOtHoursSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -469,10 +379,6 @@ export const overrideOtHours = authActionClient
     return { run_id: payslip.payroll_run_id };
   });
 
-/**
- * Append an ad-hoc line item (earning if amount > 0, deduction if < 0) to one or
- * many payslips of a run, then recalc once. Refused on a locked run.
- */
 export const addPayslipCustomField = authActionClient
   .schema(addCustomFieldSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -519,10 +425,6 @@ export const addPayslipCustomField = authActionClient
     return { run_id: parsedInput.run_id };
   });
 
-/**
- * Remove the custom field at `index` of one payslip, then recalc. Refused on a
- * locked run before any write.
- */
 export const removePayslipCustomField = authActionClient
   .schema(removeCustomFieldSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {

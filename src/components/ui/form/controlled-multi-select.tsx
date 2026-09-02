@@ -39,7 +39,6 @@ interface MultiSelectProps<
 > {
   popoverOpen?: boolean;
   setPopoverOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-  // * the above states are optional when we want to use the multi select popup as a controlled component
   options: Option[];
   placeholder?: string;
   name: TName;

@@ -57,9 +57,6 @@ const serviceTypeOptions = Object.entries(medicalServiceTypeLabels).map(
 );
 
 type SubmitClaimDialogProps = {
-  /** The signed-in employee's id. The claim files upload under this uid and the
-   *  available-balance bound is read for it; the trigger is disabled until it
-   *  resolves. */
   employeeId?: string;
   disabled?: boolean;
 };

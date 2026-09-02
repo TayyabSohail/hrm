@@ -6,9 +6,6 @@ import { PageHeader } from '@/components/hrm/page-header';
 
 export const metadata: Metadata = { title: 'Reimbursements' };
 
-/** Placeholder landing for the Reimbursements module (Phase 2). The nav entry
- *  that reaches this page only appears once an admin enables the
- *  `reimbursements_enabled` toggle in Settings → Module Toggles. */
 export default function ReimbursementsPage() {
   return (
     <>

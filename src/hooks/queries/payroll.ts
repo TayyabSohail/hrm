@@ -42,7 +42,6 @@ const fetchPayrollRuns = authQuery(async ({ supabase }) => {
   return data.map(toPayrollCycle);
 });
 
-/** All payroll runs, newest month first (admin run-list screen). */
 export const usePayrollRuns = () =>
   useQuery({
     queryKey: [QueryKeys.PAYROLL_RUNS],
@@ -62,7 +61,6 @@ const fetchRunByMonth = authQuery(
   { paramsSchema: z.object({ month: z.string() }) },
 );
 
-/** The run for a given 'YYYY-MM' month, or null if none exists yet. */
 export const useRunByMonth = (month: string) =>
   useQuery({
     queryKey: [QueryKeys.PAYROLL_RUNS, month],
@@ -73,33 +71,22 @@ export const useRunByMonth = (month: string) =>
 // ---------------------------------------------------------------------------
 // Draft / frozen payslips for a run (admin grid — RLS `payslip_admin_all`).
 // ---------------------------------------------------------------------------
-/** A payslip row with the employee's name joined, all numerics coerced. Postgres
- *  `numeric` arrives as a string over PostgREST despite the generated `number`
- *  type, so days/hours/rate/multiplier are `Number()`-ed to keep arithmetic right. */
 export type RunPayslipRow = {
   id: string;
   employeeId: string;
   employeeName: string;
   designation: string;
-  /** 'YYYY-MM'. Read off the payslip's denormalized `period_month` so a grid row
-   *  carries everything `runRowToPayslip` needs to build the invoice PDF. */
   cycleMonth: string;
   baseSalary: number;
   daysInMonth: number;
   daysWorked: number;
-  /** Null means days worked follows approved unpaid leave. */
   daysWorkedOverride: number | null;
   unpaidLeaveDays: number;
   totalBase: number;
   medical: number;
-  /** Effective hours the engine paid — the override if one is set, else the
-   *  employee's approved overtime logs for the month. */
   overtimeHours: number;
-  /** Null when `overtimeHours` is still following the approved logs; a number
-   *  when an admin has overridden it. Drives the grid's "reset to logs" affordance. */
   overtimeHoursOverride: number | null;
   overtimeMultiplier: number;
-  /** Null means the current employee/company multiplier is authoritative. */
   overtimeMultiplierOverride: number | null;
   overtimeRate: number;
   overtimePay: number;
@@ -156,9 +143,6 @@ function toRunPayslipRow(row: PayslipDbRow): RunPayslipRow {
   };
 }
 
-/** Widen a grid row to the `Payslip` domain shape the PDF renderer takes, so the
- *  admin can preview an invoice straight from the run table. The two differ only
- *  in `totalPay` vs `total` plus the grid-only `unpaidLeaveDays`. */
 export const runRowToPayslip = (row: RunPayslipRow): Payslip => ({
   id: row.id,
   employeeId: row.employeeId,
@@ -193,7 +177,6 @@ const fetchRunPayslips = authQuery(
   { paramsSchema: z.object({ runId: z.string() }) },
 );
 
-/** Payslips for one run, sorted by employee name. Drives the admin draft grid. */
 export const useRunPayslips = (runId?: string) =>
   useQuery({
     queryKey: [QueryKeys.RUN_PAYSLIPS, runId],
@@ -218,8 +201,6 @@ const fetchEmployeePayslips = authQuery(
   { paramsSchema: z.object({ employeeId: z.string() }) },
 );
 
-/** One employee's payslips. Admin employee-detail tab passes an id; the
- *  employee's own /payslips page passes their own (RLS returns only locked). */
 export const usePayslips = (employeeId?: string) =>
   useQuery({
     queryKey: [QueryKeys.PAYSLIPS, employeeId],

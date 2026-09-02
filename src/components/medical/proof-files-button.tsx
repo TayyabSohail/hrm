@@ -15,8 +15,6 @@ type ProofFilesButtonProps = {
   files: string[];
 };
 
-/** Table-cell affordance — a small attachment-count button that opens the
- *  claim's proof files in a popover. */
 export function ProofFilesButton({ files }: ProofFilesButtonProps) {
   if (!files.length) {
     return <span className='text-muted-foreground'>—</span>;

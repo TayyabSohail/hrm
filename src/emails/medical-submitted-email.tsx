@@ -4,29 +4,16 @@ import { EmailLayout } from '@/emails/components/email-layout';
 import { brand, emailStyles } from '@/emails/theme';
 
 export type MedicalSubmittedEmailProps = {
-  /** Full name of the admin recipient, when known. */
   adminName?: string | null;
-  /** Name of the employee who submitted (falls back to their email). */
   employeeName: string;
-  /** Human-readable one-liner, e.g. "Doctor Consultation · PKR 3,000 · Self". */
   summary: string;
-  /** The employee's description of the expense. */
   description: string;
-  /** Deep link to the admin approvals queue. */
   reviewUrl: string;
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo. */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
 };
 
-/**
- * Sent to every active admin when an employee submits a medical claim. Mirrors
- * `LeaveSubmittedEmail` — the CTA drops the admin onto the approvals queue where
- * they can approve or reject (subject to the server-side balance bound).
- */
 export function MedicalSubmittedEmail({
   adminName,
   employeeName,

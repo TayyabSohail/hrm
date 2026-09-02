@@ -33,8 +33,6 @@ import { DocumentsStep } from './documents-step';
 import { PersonalInfoStep } from './personal-info-step';
 import { SocialAccountsStep } from './social-accounts-step';
 
-/** A section advances only if its autosave succeeded — a server/validation
- *  error keeps the user on the current step (the toast explains why). */
 const succeeded = (result?: {
   serverError?: string;
   validationErrors?: unknown;

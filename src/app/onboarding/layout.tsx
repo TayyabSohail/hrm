@@ -6,8 +6,6 @@ import { ModeToggle } from '@/components/common/mode-toggle';
 import { appConfig } from '@/config/app';
 import { paths } from '@/constants/paths';
 
-/** Standalone shell: onboarding employees aren't Active yet, so they don't
- *  get the app sidebar — just a minimal branded frame. */
 export default function OnboardingLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {

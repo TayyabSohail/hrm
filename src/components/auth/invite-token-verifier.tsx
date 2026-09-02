@@ -30,24 +30,6 @@ type InviteTokenVerifierProps = {
   type: string;
 };
 
-/**
- * Client half of the invite landing (replaces the old /auth/confirm route) and
- * the token-exchange link in the identity trust chain.
- *
- * The server page renders this only when there is NO session yet (a private tab
- * or a fresh browser), so the emailed `?token_hash=&type=` is the sole proof of
- * identity available. A server component can't write the auth cookies, so the
- * token is exchanged here on the browser client. On success the session cookies
- * are set and we replace the URL with a clean `/auth/accept-invitation` — the
- * re-render now reads identity from the session (`getUser()` + `employees` row),
- * never from the URL, and the token no longer lingers in the address bar or
- * history.
- *
- * Expired / already-used / malformed tokens can't be exchanged. Rather than
- * bounce silently to sign-in (which leaves the invitee guessing), we surface an
- * explicit "link no longer valid" state that points them at their admin for a
- * fresh invite.
- */
 export function InviteTokenVerifier({
   tokenHash,
   type,

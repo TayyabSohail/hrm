@@ -11,9 +11,6 @@ type EmployeeDocumentsProps = {
   employeeId: string;
 };
 
-/** Admin-facing previews of an employee's uploaded identity documents. Reads
- *  signed URLs via the `idocs_admin` storage policy; missing documents show a
- *  placeholder so it's clear what's outstanding. */
 export function EmployeeDocuments({ employeeId }: EmployeeDocumentsProps) {
   const { data: docFiles, isLoading } = useIdentityDocFiles(employeeId);
 

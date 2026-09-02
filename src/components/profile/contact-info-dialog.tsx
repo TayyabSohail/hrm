@@ -28,8 +28,6 @@ type ContactInfoDialogProps = {
   defaultValues: ContactInfoInput;
 };
 
-/** Employees may self-edit contact fields only (PRD 3.1) — everything else
- *  is admin-managed. */
 export function ContactInfoDialog({ defaultValues }: ContactInfoDialogProps) {
   const [open, setOpen] = useState(false);
 

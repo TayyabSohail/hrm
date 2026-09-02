@@ -18,21 +18,10 @@ import {
 } from '@/schema/policy';
 import { markReviewedSchema } from '@/schema/policy-linkage';
 
-/** Admin gate. Server-side even though `public.is_admin()` guards both RPCs and
- *  the `*_admin_all` RLS policies — defense in depth, mirroring
- *  `actions/system-config.ts`. */
 const requireAdmin = (role?: string) => {
   if (role !== 'admin') throw new Error('Forbidden');
 };
 
-/**
- * Create a policy and publish its version 1 (admin only). Both rows land in a
- * single transaction inside `create_policy` — a plain insert followed by a
- * separate publish could leave a policy with no versions behind.
- *
- * The CKEditor body is sanitized here, before it reaches the database, so only
- * clean markup is ever persisted (stored-XSS guard).
- */
 export const createPolicy = authActionClient
   .schema(createPolicySchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -44,8 +33,7 @@ export const createPolicy = authActionClient
       p_body_html: sanitizeHtml(parsedInput.contentHtml),
     });
     if (error) {
-      // The category is uniquely constrained in the database as a final guard
-      // against two admins opening the sheet at the same time.
+      // Unique(category) — two admins opened the sheet at the same time.
       if (error.code === '23505') {
         returnValidationErrors(createPolicySchema, {
           category: { _errors: [DUPLICATE_CATEGORY_MESSAGE] },
@@ -57,12 +45,6 @@ export const createPolicy = authActionClient
     return data;
   });
 
-/**
- * Publish a new version of an existing policy (admin only). Never sets
- * `version` or `is_active` itself: `publish_policy_version` computes the next
- * version number and deactivates the previous active row in one transaction,
- * so history stays append-only and exactly one version is ever active.
- */
 export const publishPolicyVersion = authActionClient
   .schema(publishPolicyVersionSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -74,9 +56,8 @@ export const publishPolicyVersion = authActionClient
     });
     if (error) throw new Error(error.message);
 
-    // The policy version is already published before email work starts. A
-    // Resend failure must not roll back the update or prevent its in-app
-    // notification trigger from reaching employees.
+    // Best-effort: the version is already published, so a Resend failure must
+    // not undo it.
     try {
       const [
         { data: policy, error: policyError },
@@ -122,9 +103,6 @@ export const publishPolicyVersion = authActionClient
     return data;
   });
 
-/** Delete a policy document and all of the history it owns (admin only).
- * `policy_versions`, their acknowledgments, and the policy's reconciliation
- * marker are all foreign-key dependents with database-level cascades. */
 export const deletePolicy = authActionClient
   .schema(deletePolicySchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -142,52 +120,42 @@ export const deletePolicy = authActionClient
     return { id: data.id };
   });
 
-/** A repeat acknowledgment trips `unique (employee_id, policy_version_id)`.
- *  That's the intended outcome, not a failure: the employee's signature against
- *  this version is already on file, so the row we'd insert is the row that
- *  exists. Swallowed here to keep double-clicking "I acknowledge" harmless. */
 const DUPLICATE_ACKNOWLEDGMENT = '23505';
 
-/**
- * Record the signed-in employee's acknowledgment of a policy version (PRD §6.3).
- * Idempotent, and self-scoped in two independent places:
- *
- *   * `employee_id` is taken from the session here — the input schema has no
- *     such field, so there is nothing for a caller to forge.
- *   * the `ack_insert_own` RLS `with check` re-derives it from `auth.uid()` and
- *     additionally requires the version to still be active, so a stale prompt
- *     can't record an acknowledgment against a superseded version.
- *
- * Neither guard depends on the other holding.
- */
+const RLS_VIOLATION = '42501';
+const STALE_VERSION_MESSAGE =
+  'This policy has been updated since you opened it. Refresh the page and review the latest version before acknowledging.';
+
 export const acknowledgePolicy = authActionClient
   .schema(acknowledgePolicySchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
     const employeeId = authUser.user?.id;
     if (!employeeId) throw new Error('Unauthorized');
 
+    // Explain a stale version instead of surfacing the raw RLS message; the
+    // `with check` remains the guard that enforces it.
+    const { data: version, error: versionError } = await supabase
+      .from('policy_versions')
+      .select('is_active')
+      .eq('id', parsedInput.policyVersionId)
+      .maybeSingle();
+    if (versionError) throw new Error(versionError.message);
+    if (!version) throw new Error('Policy version not found');
+    if (!version.is_active) throw new Error(STALE_VERSION_MESSAGE);
+
     const { error } = await supabase.from('policy_acknowledgments').insert({
       employee_id: employeeId,
       policy_version_id: parsedInput.policyVersionId,
     });
     if (error && error.code !== DUPLICATE_ACKNOWLEDGMENT) {
-      throw new Error(error.message);
+      throw new Error(
+        error.code === RLS_VIOLATION ? STALE_VERSION_MESSAGE : error.message,
+      );
     }
 
     return { success: true };
   });
 
-/**
- * Advance a policy's reconciliation marker to its current active version (admin
- * only) — the "Mark reviewed" action behind the linkage panel (BIT-25, M3.5).
- *
- * This records only that the admin has re-read the policy against the rule it
- * governs; it never writes `payroll_settings`, so reconciling a drifted policy
- * changes no enforced value (the PRD's flag-drift/manual-reconcile resolution).
- * The version reconciled to is re-derived here from the active row rather than
- * trusted from the client, and the upsert keys on the `policy_id` primary key so
- * it's idempotent and moves an existing marker forward in place.
- */
 export const markPolicyReviewed = authActionClient
   .schema(markReviewedSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {

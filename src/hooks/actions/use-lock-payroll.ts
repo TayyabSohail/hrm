@@ -9,10 +9,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Finalize a run (admin). Invalidates the run's payslips, the run list, and the
- *  per-employee payslips key (now visible to employees under RLS). Locking no
- *  longer emails anyone — notifications are sent explicitly afterward via
- *  `useSendRunInvoices` — so `onSuccess` carries no tally. */
 export function useLockPayroll(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useAction(lockPayroll, {
@@ -21,7 +17,9 @@ export function useLockPayroll(onSuccess?: () => void) {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.PAYROLL_RUNS] });
       queryClient.invalidateQueries({ queryKey: [QueryKeys.PAYSLIPS] });
       // The admin dashboard's payroll-cycle badge reads the latest run's status.
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.DASHBOARD_SUMMARY] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.DASHBOARD_SUMMARY],
+      });
       onSuccess?.();
     },
     onError,

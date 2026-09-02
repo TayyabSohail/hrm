@@ -7,9 +7,6 @@ import {
 } from '@/schema/employee';
 import { type BankInfoInput, PK_IBAN_LENGTH } from '@/schema/onboarding';
 
-/** Identity text fields an admin self-edits (name + CNIC). Date of birth is a
- *  separate picker, rendered between them, so it isn't listed here. CNIC
- *  auto-inserts its dashes. */
 export const personalDetailsFields: TextFieldConfig<
   Exclude<keyof PersonalDetailsInput, 'dateOfBirth'>
 >[] = [
@@ -22,9 +19,6 @@ export const personalDetailsFields: TextFieldConfig<
   },
 ];
 
-/** Contact fields shared by the self-service profile editor and the admin
- *  contact editor. Phone / emergency contact / postal code accept digits only;
- *  the address is split into street / city / postal code. */
 export const contactInfoFields: TextFieldConfig<keyof ContactInfoInput>[] = [
   {
     name: 'phone',
@@ -55,8 +49,6 @@ export const contactInfoFields: TextFieldConfig<keyof ContactInfoInput>[] = [
   },
 ];
 
-/** Bank fields shown in the self-service profile bank editor, in display order.
- *  Account number accepts digits only; the compact dialog omits placeholders. */
 export const bankInfoFields: TextFieldConfig<keyof BankInfoInput>[] = [
   { name: 'bankName', label: 'Bank name' },
   { name: 'accountHolderName', label: 'Account holder name' },

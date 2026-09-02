@@ -4,29 +4,16 @@ import { EmailLayout } from '@/emails/components/email-layout';
 import { brand, emailStyles } from '@/emails/theme';
 
 export type LeaveSubmittedEmailProps = {
-  /** Full name of the admin recipient, when known. */
   adminName?: string | null;
-  /** Name of the employee who submitted (falls back to their email). */
   employeeName: string;
-  /** Human-readable one-liner, e.g. "Paid Leave · 3 day(s) from Jul 8, 2026". */
   summary: string;
-  /** The employee's stated reason for the leave. */
   reason: string;
-  /** Deep link to the admin approvals queue. */
   reviewUrl: string;
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo. */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
 };
 
-/**
- * Sent to every active admin when an employee submits a leave request. Mirrors
- * `OnboardingSubmittedEmail` — the CTA drops the admin onto the approvals queue
- * where they can approve or reject.
- */
 export function LeaveSubmittedEmail({
   adminName,
   employeeName,

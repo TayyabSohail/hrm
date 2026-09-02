@@ -1,12 +1,5 @@
 import type { CSSProperties } from 'react';
 
-/**
- * Shared brand palette + style primitives for every transactional template
- * under `src/emails`. Emails can't read CSS variables, so the brand hexes
- * (mirrors `globals.css`) live here directly. `invite-email.tsx` predates this
- * module and inlines its own copy; new templates consume these so the lifecycle
- * emails stay visually consistent.
- */
 export const brand = {
   green: '#04CD77', // brand-500 — primary action / approved accent
   greenDark: '#02502E', // brand-800

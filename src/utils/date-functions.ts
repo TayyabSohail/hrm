@@ -4,22 +4,16 @@ const DATE_FORMAT = 'dd/MM/yy';
 const TIME_FORMAT = 'HH:mm:ss a';
 const MONTH_FORMAT = 'yyyy-MM';
 
-/** The current month as 'YYYY-MM', in the viewer's own timezone. */
+// The current month as 'YYYY-MM', in the viewer's own timezone.
 export function currentMonth(): string {
   return format(new Date(), MONTH_FORMAT);
 }
 
-/** The current year as 'YYYY', in the viewer's own timezone. Matches the
- *  whole-year value MonthFilter emits, so it seeds the month filter to the
- *  current year (a `.startsWith('YYYY')` match scopes a list to that year). */
+// The current year as 'YYYY', in the viewer's own timezone.
 export function currentYear(): string {
   return format(new Date(), 'yyyy');
 }
 
-/** The month after a 'YYYY-MM' month, as 'YYYY-MM'. Deliberately string math
- *  rather than a Date round-trip: `new Date('2026-07-01')` parses as UTC
- *  midnight, so anywhere behind UTC it formats back as June and the month never
- *  advances. */
 export function nextMonth(month: string): string {
   const [year, monthNumber] = month.split('-').map(Number);
   return monthNumber === 12

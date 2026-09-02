@@ -17,15 +17,10 @@ import {
 type CancelInviteDialogProps = {
   employeeId: string;
   employeeName: string;
-  /** Controlled by the caller — the trigger lives in the row's actions menu, so
-   *  the dialog is rendered outside that menu and opened via these props. */
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-/** Confirmation for revoking a pending invitation. It's destructive — the
- *  invitee's account is deleted outright — so it's gated behind an explicit
- *  confirm rather than firing straight from the menu. */
 export function CancelInviteDialog({
   employeeId,
   employeeName,

@@ -140,13 +140,12 @@ export function EmployeeBalances() {
     leaveBalance && leaveBalance.poolTotal > 0
       ? Math.min(100, (leaveBalance.used / leaveBalance.poolTotal) * 100)
       : 0;
-  const medicalRemaining = Math.max(
-    0,
-    (medicalBalance?.cap ?? 0) - (medicalBalance?.accrued ?? 0),
-  );
+  // Headline is what's claimable right now (accrued − approved claims,
+  // floored by the RPC) — the same figure the /medical page shows. Accrued
+  // alone ignores everything already reimbursed.
   const medicalProgress =
     medicalBalance && medicalBalance.cap > 0
-      ? Math.min(100, (medicalBalance.accrued / medicalBalance.cap) * 100)
+      ? Math.min(100, (medicalBalance.available / medicalBalance.cap) * 100)
       : 0;
 
   if (leaveLoading || medicalLoading || !leaveBalance || !medicalBalance) {
@@ -173,11 +172,11 @@ export function EmployeeBalances() {
       <EmployeeDashboardCard
         title='Medical Allowance'
         icon={HeartPulse}
-        value={formatCurrency(medicalBalance.accrued) || '0'}
-        secondary={`of ${formatCurrency(medicalBalance.cap)} cap`}
+        value={formatCurrency(medicalBalance.available) || '0'}
+        secondary={`available of ${formatCurrency(medicalBalance.cap)} cap`}
         progress={medicalProgress}
-        progressLabel={`${formatCurrency(medicalBalance.accrued)} available of ${formatCurrency(medicalBalance.cap)}`}
-        footer={`${formatCurrency(medicalRemaining)} remaining · ${formatCurrency(medicalBalance.monthlyAccrual)}/month`}
+        progressLabel={`${formatCurrency(medicalBalance.available)} available of ${formatCurrency(medicalBalance.cap)}`}
+        footer={`${formatCurrency(medicalBalance.spent) || '0'} used · ${formatCurrency(medicalBalance.monthlyAccrual)}/month`}
       />
       <Link
         href={paths.employee.payslips}

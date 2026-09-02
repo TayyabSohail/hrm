@@ -4,30 +4,16 @@ import { EmailLayout } from '@/emails/components/email-layout';
 import { brand, emailStyles } from '@/emails/theme';
 
 export type OvertimeDecisionEmailProps = {
-  /** Full name of the employee, when known. */
   fullName?: string | null;
-  /** The admin's decision on the log. */
   decision: 'approved' | 'rejected';
-  /** Human-readable one-liner, e.g. "3 hr(s) · HRM Frontend". */
   summary: string;
-  /** The admin's reason — required and rendered when rejected. */
   rejectionReason?: string | null;
-  /** Deep link back to the employee's overtime page. */
   overtimeUrl: string;
-  /** Product name, e.g. "Bitsmiths HRM". */
   appName: string;
-  /** Absolute origin used to resolve the hosted logo. */
   baseUrl: string;
-  /** Where replies and help requests should go. */
   supportEmail: string;
 };
 
-/**
- * Sent to the employee when an admin approves or rejects their overtime log.
- * Approved reads as a green confirmation (pay is computed at the payroll run);
- * rejected surfaces the admin's reason verbatim in a callout (the same reason
- * shown in their history UI).
- */
 export function OvertimeDecisionEmail({
   fullName,
   decision,

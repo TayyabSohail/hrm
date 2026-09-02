@@ -33,8 +33,6 @@ const toVersion = (row: PolicyVersionRow) =>
     isActive: row.is_active,
   }) satisfies PolicyVersion;
 
-/** Oldest first — the `Policy.versions` contract every consumer relies on
- *  (`previousVersion` walks it backwards from the active entry). */
 const byVersionAscending = (a: PolicyVersion, b: PolicyVersion) =>
   a.version - b.version;
 
@@ -78,8 +76,6 @@ const fetchPolicy = authQuery(
   { paramsSchema: z.object({ policyId: z.string().uuid() }) },
 );
 
-/** Exactly one row per policy — the active version — enforced by the
- *  `policy_versions_one_active_idx` partial unique index. */
 const fetchActivePolicies = authQuery(async ({ supabase }) => {
   const { data, error } = await supabase
     .from('policy_versions')
@@ -102,8 +98,6 @@ const fetchActivePolicies = authQuery(async ({ supabase }) => {
   );
 });
 
-/** An acknowledgment row points at a *version*, so the policy it belongs to and
- *  the version number an employee signed both come from the embedded parent. */
 const ACKNOWLEDGMENT_COLUMNS =
   'employee_id, policy_version_id, acknowledged_at, policy_versions(version, policy_id)';
 
@@ -156,7 +150,6 @@ export const usePolicy = (policyId: string) =>
     enabled: !!policyId,
   });
 
-/** Employee-facing list: the current version of each policy, nothing else. */
 export const useActivePolicies = () =>
   useQuery({
     queryKey: [QueryKeys.ACTIVE_POLICIES],
@@ -206,8 +199,6 @@ export const usePendingAcknowledgments = () => {
 export const useUnacknowledgedPolicyCount = () =>
   usePendingAcknowledgments().data.length;
 
-/** Active employees only — invited/onboarding accounts don't have
- *  self-service access yet, so acknowledgment doesn't apply to them. */
 export const useActiveEmployees = () => {
   const { data: employees, isLoading } = useEmployees();
   return {

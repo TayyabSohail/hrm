@@ -14,13 +14,8 @@ import { exportPayoneerSchema } from '@/schema/payroll-export';
 import type { Tables } from '@/types/supabase';
 
 const EXPORTS_BUCKET = 'payroll-exports';
-/** Short TTL — the URL is only used for the immediate post-export download; the
- *  history view mints its own fresh signed URLs on demand. */
 const DOWNLOAD_TTL_SECONDS = 60 * 5;
 
-/** One run payslip with the employee name joined (via the `payslips → employees`
- *  FK). Declared explicitly so `rows` reads as a checked annotation — supabase-js
- *  infers a shape assignable to this, so no `as` cast is needed. */
 type ExportPayslipRow = Pick<
   Tables<'payslips'>,
   'employee_id' | 'total_pay'
@@ -28,21 +23,6 @@ type ExportPayslipRow = Pick<
   employees: Pick<Tables<'employees'>, 'full_name'> | null;
 };
 
-/**
- * Build and persist the Payoneer bulk-payment CSV for a *locked* run.
- *
- * Locked-only at two layers: the employee payslip view relies on the RLS
- * `payslip_own_locked` gate; this action adds its own explicit `status` refuse
- * because it reads via the service-role client (which bypasses RLS entirely).
- *
- * Bank details are read cross-employee through `supabaseAdmin` — the action's
- * own `role === 'admin'` guard is the access control here, not RLS. Amounts are
- * the frozen `payslips.total_pay` snapshot (recipient PKR); the engine is never
- * re-run. A missing IBAN is a hard, per-employee error: we validate every
- * *included* row before writing anything, so a bad row records no currency, no
- * file, no row — while `excludedEmployeeIds` is the escape hatch that lets the
- * rest of the run go out without them.
- */
 export const exportPayoneer = authActionClient
   .schema(exportPayoneerSchema)
   .action(async ({ parsedInput, ctx: { supabase, authUser } }) => {
@@ -51,8 +31,7 @@ export const exportPayoneer = authActionClient
 
     const { run_id, currencyByEmployee, excludedEmployeeIds } = parsedInput;
 
-    // Locked-only gate (via the caller's RLS-scoped client). `period_month`
-    // names the file after the month it pays.
+    // `period_month` also names the file after the month it pays.
     const { data: run, error: runError } = await supabase
       .from('payroll_runs')
       .select('id, status, period_month')
@@ -62,9 +41,8 @@ export const exportPayoneer = authActionClient
     if (run.status !== 'locked')
       throw new Error('Run must be locked before export.');
 
-    // Cross-employee reads need the service-role client. bank_details is fetched
-    // separately (keyed by employee_id) rather than embedded off payslips —
-    // there is no direct payslips → bank_details FK for PostgREST to follow.
+    // `bank_details` is fetched separately below rather than embedded: there is
+    // no direct payslips → bank_details FK for PostgREST to follow.
     const { data: payslipData, error: payslipError } = await supabaseAdmin
       .from('payslips')
       .select('employee_id, total_pay, employees(full_name)')
@@ -75,9 +53,8 @@ export const exportPayoneer = authActionClient
     if (allRows.length === 0)
       throw new Error('This run has no payslips to export.');
 
-    // Everything downstream — validation, the currency stamp, the file — works
-    // off the included set only. That is what lets one person's missing IBAN be
-    // worked around by excluding them rather than blocking the whole run.
+    // Everything downstream works off the included set only, so one person's
+    // missing IBAN can be worked around instead of blocking the run.
     const excluded = new Set(excludedEmployeeIds);
     const rows = allRows.filter((row) => !excluded.has(row.employee_id));
     if (rows.length === 0)
@@ -97,7 +74,7 @@ export const exportPayoneer = authActionClient
       (bankData ?? []).map((bank) => [bank.employee_id, bank]),
     );
 
-    // Validate EVERY row first (missing currency / IBAN → hard error, no writes).
+    // Validate every row before any write, so a bad row leaves nothing behind.
     const dataRows: (string | number)[][] = [];
     for (const row of rows) {
       const name = row.employees?.full_name ?? row.employee_id;
@@ -120,9 +97,7 @@ export const exportPayoneer = authActionClient
       ]);
     }
 
-    // Persist the chosen source currency onto each snapshot (one UPDATE per
-    // distinct currency, run concurrently). Only reached once every row
-    // validated, so a bad row never leaves a partial write behind.
+    // One update per distinct currency, run concurrently.
     const employeesByCurrency = new Map<string, string[]>();
     for (const row of rows) {
       const source = currencyByEmployee[row.employee_id];
@@ -143,12 +118,11 @@ export const exportPayoneer = authActionClient
     const failedUpdate = updates.find((result) => result.error);
     if (failedUpdate?.error) throw new Error(failedUpdate.error.message);
 
-    // Build the CSV from an array-of-arrays so column order === the header.
+    // Array-of-arrays keeps column order identical to the header.
     const csv = toCsv([[...PAYONEER_HEADER], ...dataRows]);
 
-    // Keep the payroll-month filename readable. Existing artifacts for this run
-    // claim the next Word-style copy suffix instead of putting a timestamp in
-    // every export name.
+    // Re-exports take the next copy suffix, keeping a readable month-named file
+    // instead of a timestamp in every name.
     const { data: existingFiles, error: listError } =
       await supabaseAdmin.storage
         .from(EXPORTS_BUCKET)
@@ -172,7 +146,7 @@ export const exportPayoneer = authActionClient
       });
     if (uploadError) throw new Error(uploadError.message);
 
-    // Record the artifact (via the RLS-scoped client — proves an admin session).
+    // Recorded via the RLS-scoped client, which proves an admin session.
     const { error: insertError } = await supabase
       .from('payroll_exports')
       .insert({

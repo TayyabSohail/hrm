@@ -4,18 +4,13 @@ import { EmailLayout } from '@/emails/components/email-layout';
 import { emailStyles } from '@/emails/theme';
 
 export type OnboardingInviteEmailProps = {
-  /** Admin-authored, already-sanitized HTML with merge tokens substituted. */
+  // Admin-authored, already-sanitized HTML with merge tokens substituted.
   bodyHtml: string;
   appName: string;
   baseUrl: string;
   supportEmail: string;
 };
 
-/**
- * The editable invitation message inside the same branded shell as every
- * other transactional email. The body is sanitized when it is saved and its
- * merge-token values are escaped before this component receives it.
- */
 export function OnboardingInviteEmail({
   bodyHtml,
   appName,

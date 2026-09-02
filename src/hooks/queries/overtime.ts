@@ -8,15 +8,10 @@ import { QueryKeys } from '@/constants/query-keys';
 import { OvertimeLog } from '@/types/hrm';
 import { type Tables } from '@/types/supabase';
 
-/** An `overtime_logs` row with its project name joined (via project_id FK). */
 type OvertimeLogRow = Tables<'overtime_logs'> & {
   projects?: Pick<Tables<'projects'>, 'name'> | null;
 };
 
-/** Map an `overtime_logs` row onto the `OvertimeLog` domain type. `project`
- *  carries the joined project name (the FK resolves it even after a project is
- *  deactivated). The admin queue passes the requester's name; self/per-employee
- *  reads leave it '' — those surfaces don't render it. */
 export function toOvertimeLog(
   row: OvertimeLogRow,
   employeeName = '',

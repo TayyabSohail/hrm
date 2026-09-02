@@ -27,9 +27,6 @@ const fetchHrmSettings = authQuery(async ({ supabase }) => {
   } satisfies HrmSettings;
 });
 
-/** Module-wide payroll config admins can change (overtime multiplier, leave
- *  pool, medical accrual/cap). Backed by the `payroll_settings` singleton;
- *  saving invalidates this key (see `use-update-payroll-settings`). */
 export const useHrmSettings = () =>
   useQuery({
     queryKey: [QueryKeys.HRM_SETTINGS],

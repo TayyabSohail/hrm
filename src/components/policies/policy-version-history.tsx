@@ -36,17 +36,11 @@ import {
 } from '@/types/hrm';
 
 type PolicyVersionHistoryProps = {
-  /** Only the title is needed — it heads the preview dialog. */
   policy: Pick<Policy, 'title'>;
   versions: PolicyVersion[];
   currentVersionNumber: number;
-  /** Active employees — acknowledgment status inside each version panel is
-   *  reported against these. */
   employees: EmployeeListItem[];
-  /** Append-only acknowledgment history for this policy: one record per
-   *  version each employee acknowledged. */
   acknowledgments: PolicyAcknowledgment[];
-  /** Omit to hide the revert action (e.g. read-only contexts). */
   onRevert?: (version: PolicyVersion) => void;
 };
 
@@ -60,9 +54,6 @@ export function PolicyVersionHistory({
 }: PolicyVersionHistoryProps) {
   const newestFirst = [...versions].reverse();
   const [openVersion, setOpenVersion] = useState(`v${currentVersionNumber}`);
-  /** The version currently open in the preview dialog, if any. Policy bodies
-   *  are sanitized HTML in the database, so any version renders in-app through
-   *  the same component employees read — no file, no new tab. */
   const [previewVersion, setPreviewVersion] = useState<PolicyVersion | null>(
     null,
   );
