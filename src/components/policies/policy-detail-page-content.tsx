@@ -10,6 +10,7 @@ import {
   currentVersion,
   hasAcknowledged,
   latestAcknowledgment,
+  previousVersion,
   useMyPolicyAcknowledgments,
   usePolicy,
 } from '@/hooks/queries/policies';
@@ -58,18 +59,18 @@ export function PolicyDetailPageContent({
 
   const latest = currentVersion(policy);
   const ack = latestAcknowledgment(acknowledgments ?? [], policy.id);
-  // Compliance is per version id, not "at least version N" — only an
-  // acknowledgment of the version on screen counts.
   const upToDate = hasAcknowledged(acknowledgments ?? [], latest.id);
-
-  // Show what changed in the most recently published update, independent of
-  // each employee's acknowledgment history.
-  const previousVersion = policy.versions.at(-2);
-  const displayHtml = previousVersion
-    ? highlightChangedBlocks(previousVersion.contentHtml, latest.contentHtml)
+  const diffBase =
+    ack && !upToDate
+      ? (policy.versions.find(
+          (version) => version.version === ack.acknowledgedVersion,
+        ) ?? previousVersion(policy, latest))
+      : undefined;
+  const displayHtml = diffBase
+    ? highlightChangedBlocks(diffBase.contentHtml, latest.contentHtml)
     : latest.contentHtml;
-  const diffSummary = previousVersion
-    ? getPolicyDiffSummary(previousVersion.contentHtml, latest.contentHtml)
+  const diffSummary = diffBase
+    ? getPolicyDiffSummary(diffBase.contentHtml, latest.contentHtml)
     : 0;
 
   const handleAcknowledge = async () => {
@@ -127,8 +128,10 @@ export function PolicyDetailPageContent({
             <div className='mb-4 flex items-center gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-700 dark:text-amber-300'>
               <Megaphone className='size-4 shrink-0' aria-hidden />
               <span>
-                {diffSummary} change{diffSummary === 1 ? '' : 's'} since the
-                previous version.
+                {diffSummary} change{diffSummary === 1 ? '' : 's'} since{' '}
+                {diffBase?.version === ack?.acknowledgedVersion
+                  ? `version ${diffBase?.version}, the one you last acknowledged.`
+                  : 'the previous version.'}
               </span>
             </div>
           )}

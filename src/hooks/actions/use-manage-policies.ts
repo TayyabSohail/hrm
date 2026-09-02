@@ -13,9 +13,8 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Both writes change what employees see, so both invalidate the admin
- *  repository *and* the employee active-version list (which also feeds the
- *  sidebar's unacknowledged badge). */
+import { PolicyVersion } from '@/types/hrm';
+
 const invalidatePolicies = (queryClient: ReturnType<typeof useQueryClient>) => {
   queryClient.invalidateQueries({ queryKey: [QueryKeys.POLICIES] });
   queryClient.invalidateQueries({ queryKey: [QueryKeys.ACTIVE_POLICIES] });
@@ -23,13 +22,6 @@ const invalidatePolicies = (queryClient: ReturnType<typeof useQueryClient>) => {
     queryKey: [QueryKeys.POLICY_ACKNOWLEDGMENTS],
   });
 };
-
-/** Create a policy and publish its version 1 (admin). The created row is handed
- *  to `onSuccess` so the caller can navigate straight to the new editor page.
- *
- *  A taken category comes back as a field error rather than a server error; pass
- *  `onCategoryError` to pin it under the input (the shared toast handler would
- *  otherwise announce it as a nameless "Validation Error"). */
 export function useCreatePolicy(
   onSuccess?: (policyId: string) => void,
   onCategoryError?: (message: string) => void,
@@ -55,12 +47,7 @@ export function useCreatePolicy(
 /** Publish the next version of an existing policy (admin). The new version
  *  number comes back from the RPC — the client never computes it. */
 export function usePublishPolicyVersion(
-  onSuccess?: (version: {
-    id: string;
-    version: number;
-    contentHtml: string;
-    publishedAt: string;
-  }) => void,
+  onSuccess?: (version: PolicyVersion) => void,
 ) {
   const queryClient = useQueryClient();
   return useAction(publishPolicyVersion, {
@@ -72,6 +59,7 @@ export function usePublishPolicyVersion(
           version: data.version,
           contentHtml: data.body_html,
           publishedAt: data.published_at,
+          isActive: data.is_active,
         });
       }
     },

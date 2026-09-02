@@ -283,59 +283,36 @@ export type OnboardingEmailTemplate = {
 export type PolicyCategory = 'leave' | 'medical' | 'overtime' | 'general';
 
 export type PolicyVersion = {
-  /** The `policy_versions` row id — what an acknowledgment points at. */
   id: string;
   version: number;
-  /** Rich-text content authored in CKEditor, stored as HTML — not a PDF —
-   *  so a diff against the previous version can highlight exactly what
-   *  changed for employees, instead of just swapping in a new file. */
-  contentHtml: string;
+ contentHtml: string;
   publishedAt: string;
+  isActive: boolean;
 };
 
 export type Policy = {
   id: string;
   title: string;
-  /** Kebab-case, unique, stable across title edits — the join key M3.5 uses to
-   *  tie a policy document to the rule the system actually enforces. */
   slug: string;
   category: PolicyCategory;
-  /** Oldest first; the last entry is the current version. */
   versions: PolicyVersion[];
 };
-
-/** A policy flattened onto its single active version — what employees see and
- *  what the sidebar badge counts. Deliberately omits `contentHtml`: the list
- *  only needs the heading, and the body is fetched on the detail page. */
 export type ActivePolicy = {
   id: string;
   title: string;
   slug: string;
   category: PolicyCategory;
-  /** The `policy_versions` row id of the active version — what an
-   *  acknowledgment actually points at. The version *number* below is for
-   *  display and for comparing against what the employee last acknowledged. */
-  versionId: string;
+   versionId: string;
   version: number;
   publishedAt: string;
 };
-
-/** One employee's acknowledgment of a policy — separate from `Policy`
- *  itself since each employee can be at a different acknowledged version.
- *  Rows are append-only: acknowledging v2 does not replace the v1 record, so
- *  the admin's per-version roster can still show who signed what, when. */
 export type PolicyAcknowledgment = {
   policyId: string;
   employeeId: string;
-  /** The acknowledged `policy_versions` row. Carried alongside the version
-   *  number because the number is only unique *within* a policy. */
   policyVersionId: string;
   acknowledgedVersion: number;
   acknowledgedAt: string;
 };
-
-/** One employee's standing against one policy's currently-active version, as
- *  returned by the `policy_compliance()` RPC. */
 export type PolicyComplianceEmployee = {
   employeeId: string;
   fullName: string;
@@ -343,25 +320,14 @@ export type PolicyComplianceEmployee = {
   /** Null exactly when `acknowledged` is false. */
   acknowledgedAt: string | null;
 };
-
-/** A policy's compliance roster, rolled up from `policy_compliance()`. Measured
- *  against the active version only — a prior-version acknowledgment does not
- *  count, which is why publishing an update drops the percentage. */
 export type PolicyCompliance = {
   policyId: string;
   title: string;
-  /** The active version everyone is measured against — shown next to the title
-   *  so the grid names what "acknowledged" refers to. */
   version: number;
   employees: PolicyComplianceEmployee[];
   acknowledgedCount: number;
   totalCount: number;
 };
-
-/** One row of the admin compliance grid. The grid is a two-level tree — a
- *  policy rollup with its employees as expandable sub-rows — and TanStack Table
- *  needs a single row type for both levels, so `employee` is what distinguishes
- *  a child row from its parent. */
 export type PolicyComplianceRow = {
   /** Unique across both levels: the policy id, or `<policyId>:<employeeId>`. */
   id: string;
@@ -370,10 +336,6 @@ export type PolicyComplianceRow = {
   employee?: PolicyComplianceEmployee;
   subRows?: PolicyComplianceRow[];
 };
-
-/** One policy's standing against the rule it governs (BIT-25). Drift is a pure
- *  version comparison — the policy's current active version vs the one an admin
- *  last reconciled — never a diff of policy prose against enforced values. */
 export type PolicyLinkage = {
   policyId: string;
   title: string;
@@ -392,42 +354,23 @@ export type PolicyLinkage = {
 export type ContractVersion = {
   version: number;
   fileName: string;
-  /** Key in the private `contracts` bucket; the UI mints a short-lived signed
-   *  URL from it on demand (see `useContractFileUrls`). */
   storagePath: string;
   uploadedAt: string;
-  /** e.g. "Annual renewal", "Promoted to Senior Engineer". */
   note: string | null;
 };
-
-/** One contract per employee (PRD 6.2 — manual PDF upload, not
- *  system-generated). Admin sees the full version history; the employee
- *  only ever sees their current version — enforced by `contracts_select_own`,
- *  not just by the query. */
 export type EmployeeContract = {
   employeeId: string;
-  /** Oldest first; the last entry is the current version. */
   versions: ContractVersion[];
 };
 
-/** The event kinds a notification can carry. The table is generic (`type` +
- *  `link`), so this is a string on the wire; the union documents the producers
- *  that exist today (BIT-26 ships only `policy_updated`) and stays open for
- *  later ones without a schema change. */
 export type NotificationType = 'policy_updated' | (string & {});
 
-/** One row of the signed-in user's in-app notification feed (BIT-26). Rows are
- *  trigger-created, never client-inserted; the client only ever flips
- *  `readAt` via mark-read. */
 export type Notification = {
   id: string;
   type: NotificationType;
   title: string;
-  /** Longer supporting line; null for events that need only a title. */
   body: string | null;
-  /** In-app route the bell navigates to on click, e.g. '/policies'. */
   link: string | null;
-  /** Null until the recipient reads it — the unread test. */
   readAt: string | null;
   createdAt: string;
 };
