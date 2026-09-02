@@ -9,7 +9,6 @@ import { onError } from '@/lib/show-error-toast';
 
 import { QueryKeys } from '@/constants/query-keys';
 
-/** Set or clear a per-payslip OT-multiplier override and recalc the run. */
 export function useOverrideOtMultiplier(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useAction(overrideOtMultiplier, {

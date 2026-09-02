@@ -3,21 +3,11 @@ import { z } from 'zod';
 import { hrmConfig } from '@/constants/hrm-config';
 import { getZodEnum } from '@/schema/common';
 
-/** Upload limits (PRD 7.3). Enforced client-side (FileUpload + Zod), by the
- *  `medical-proofs` bucket (size/MIME), and by the `enforce_max_medical_files`
- *  DB trigger (count) — a bypassed client can't get around the last two. */
 export const MAX_FILES = hrmConfig.maxProofFiles;
 export const MAX_FILE_BYTES = hrmConfig.maxProofFileSizeMb * 1024 * 1024;
 
-/** Medical Allowance Policy §5: an expense date must be today or within the
- *  preceding 30 days — never in the future. */
 export const SUBMISSION_WINDOW_DAYS = 30;
 
-/** The inclusive `[earliest, today]` calendar-day bounds for a valid expense
- *  date. Shared by the form's date picker (to disable everything outside the
- *  window) and the Zod refine below, so the calendar and validation never
- *  disagree. Compared by calendar day (midnight-normalized), not elapsed ms, so
- *  the exact 30-day-ago boundary is accepted rather than rejected on a technicality. */
 export function expenseDateBounds(): { earliest: Date; today: Date } {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -26,20 +16,12 @@ export function expenseDateBounds(): { earliest: Date; today: Date } {
   return { earliest, today };
 }
 
-/** Runs on both the client (form) and the server (action re-validates). */
 function isWithinSubmissionWindow(value: string): boolean {
   const expenseDate = new Date(`${value}T00:00:00`);
   const { earliest, today } = expenseDateBounds();
   return expenseDate >= earliest && expenseDate <= today;
 }
 
-/**
- * Server-authoritative claim fields, re-validated in `createMedicalClaim`. The
- * amount is whole PKR (`500.5` fails `.int()`). The balance bound is NOT here —
- * it's enforced at approval time against `medical_balance()` (a pending claim
- * never moves the balance), so submitting above balance is allowed; approving
- * above it is not.
- */
 export const medicalClaimFieldsSchema = z.object({
   claimFor: z.enum(['self', 'parent', 'spouse', 'child'], {
     required_error: 'Select who this claim is for',
@@ -74,12 +56,6 @@ export const medicalClaimFieldsSchema = z.object({
 
 export type MedicalClaimFields = z.infer<typeof medicalClaimFieldsSchema>;
 
-/**
- * Client-side submit schema. Extends the server fields with the `maxAmount`
- * balance bound (a UX guard — the real bound is server-side at approval) and
- * the proof-file constraints: 1–5 files, each ≤ 10 MB. `File` is referenced
- * only inside this factory so the shared module stays server-safe.
- */
 export function createMedicalClaimSchema(maxAmount: number) {
   return medicalClaimFieldsSchema.extend({
     amount: z.coerce
@@ -107,11 +83,6 @@ export type MedicalClaimInput = z.infer<
   ReturnType<typeof createMedicalClaimSchema>
 >;
 
-/**
- * Admin decision on a pending claim. A rejection must carry a reason — it is
- * stored on the row, emailed to the employee, and shown in their history
- * (mirrors `reviewLeaveSchema`).
- */
 export const reviewMedicalSchema = z
   .object({
     id: z.string().uuid(),

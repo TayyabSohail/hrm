@@ -22,7 +22,6 @@ const baseHrmSettingsSchema = z.object({
     .positive('Must be greater than 0'),
 });
 
-/** Every numeric HRM setting edited together in the Configuration card. */
 export const hrmSettingsSchema = baseHrmSettingsSchema.refine(
   (data) => data.medicalBalanceCap >= data.medicalMonthlyAccrual,
   {

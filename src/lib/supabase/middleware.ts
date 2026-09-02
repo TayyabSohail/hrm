@@ -7,15 +7,10 @@ import { env } from '@/env';
 import type { AccountStatus } from '@/types/hrm';
 import type { Database } from '@/types/supabase';
 
-/** Reachable without a session: every auth screen (login, forgot/reset
- * password, accept invitation, OAuth callback). The root route is handled by
- * the explicit middleware redirect below, so no landing page exists. */
 function isPublicRoute(pathname: string) {
   return pathname.startsWith('/auth');
 }
 
-/** Employee-app routes live in the (employee) route group, which adds no URL
- *  prefix, so they're enumerated from the paths config. */
 const employeeRoutes = Object.values(paths.employee);
 
 function isEmployeeRoute(pathname: string) {
@@ -24,13 +19,10 @@ function isEmployeeRoute(pathname: string) {
   );
 }
 
-/** Every admin-app route is namespaced under /admin. */
 function isAdminRoute(pathname: string) {
   return pathname === paths.admin.dashboard || pathname.startsWith('/admin/');
 }
 
-/** Until onboarding is complete, employees are confined to the wizard. Active
- * employees have full app access. */
 function employeeGateFor(status: AccountStatus | undefined): string | null {
   if (status === 'invited' || status === 'onboarding') {
     return paths.employee.onboarding;
@@ -38,7 +30,6 @@ function employeeGateFor(status: AccountStatus | undefined): string | null {
   return null;
 }
 
-/** Redirect that carries over any auth cookies refreshed on this request. */
 function redirectWithCookies(
   request: NextRequest,
   from: NextResponse,

@@ -7,23 +7,10 @@ import Logger from '@/utils/logger';
 
 type SendOnboardingInviteInput = {
   to: string;
-  /** Invitee's name for the `{{employee_name}}` token; '' when unknown. */
   employeeName: string;
-  /** The `/auth/accept-invitation` URL for the `{{onboarding_link}}` token. */
   onboardingLink: string;
 };
 
-/**
- * Render the saved onboarding email and send it (M1.3 invite + resend).
- *
- * The template read uses the service-role client because RLS on
- * `onboarding_email_template` is admin-only and this runs mid-invite (the caller
- * is an admin, but reading out-of-band keeps the concern here). If the row is
- * missing/empty we log and fall through — `renderOnboardingEmail` substitutes
- * its built-in default, so an invite never fails for lack of a template. This
- * owns only the email's subject/body source; the onboarding link itself is
- * still minted by the invite action (ownership boundary, PRD).
- */
 export async function sendOnboardingInvite({
   to,
   employeeName,

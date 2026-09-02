@@ -14,9 +14,6 @@ import {
 
 import { type Tables } from '@/types/supabase';
 
-/** The caller's saved onboarding values, mapped from the DB columns back onto
- *  the wizard's form shapes so each section can restore on refresh. Missing
- *  satellite rows (bank/socials not yet saved) collapse to empty strings. */
 type OnboardingData = {
   email: string;
   personal: PersonalInfoInput;
@@ -64,7 +61,7 @@ const fetchOnboarding = authQuery<undefined, OnboardingData>(
   },
 );
 
-/** Section 1–3 saved values for the onboarding wizard (self, via RLS). */
+// Section 1–3 saved values for the onboarding wizard (self, via RLS).
 export const useOnboardingData = () =>
   useQuery({
     queryKey: [QueryKeys.ONBOARDING],
@@ -87,8 +84,6 @@ const fetchEmployeeDocuments = authQuery<undefined, UploadedDocument[]>(
   },
 );
 
-/** The caller's uploaded identity documents (section 4). Keyed by userId so the
- *  upload mutation can invalidate exactly this cache entry. */
 export const useEmployeeDocuments = (userId: string) =>
   useQuery({
     queryKey: [QueryKeys.EMPLOYEE_DOCUMENTS, userId],
@@ -99,17 +94,8 @@ export const useEmployeeDocuments = (userId: string) =>
 const IDENTITY_DOCS_BUCKET = 'identity-docs';
 const SIGNED_URL_TTL_SECONDS = 60 * 60; // 1h — long enough to view a preview
 
-/** A viewable identity document: a short-lived signed URL plus its stored MIME
- *  type (so the preview knows whether to render an image or a PDF). */
 export type IdentityDocFile = { url: string; mimeType: string };
 
-/**
- * Signed URLs + MIME types for an owner's uploaded identity documents, keyed by
- * doc_type. Reads directly from storage (the object metadata carries the MIME
- * type the DB row doesn't), so it powers previews for both the owner during
- * onboarding and an admin on the employee detail page — the `identity-docs`
- * RLS policies (`idocs_own` / `idocs_admin`) gate access to each.
- */
 export const useIdentityDocFiles = (ownerId: string) =>
   useQuery({
     queryKey: [QueryKeys.IDENTITY_DOC_FILES, ownerId],
@@ -152,9 +138,7 @@ export const useIdentityDocFiles = (ownerId: string) =>
     },
   });
 
-/** A deliberately narrow variant for roster-style avatars. It reads the object
- * metadata to determine whether a photo exists, but signs only the image — not
- * the employee's CNIC documents that share the same private bucket. */
+// A deliberately narrow variant for roster-style avatars.
 export const useProfilePhoto = (ownerId: string) =>
   useQuery({
     queryKey: [QueryKeys.IDENTITY_DOC_FILES, ownerId, 'profile-photo'],

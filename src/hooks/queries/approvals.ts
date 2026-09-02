@@ -20,7 +20,6 @@ const fetchAllLeaveRequests = authQuery(async ({ supabase }) => {
   return data.map((row) => toLeaveRequest(row, row.employees?.full_name ?? ''));
 });
 
-/** Admin view: every leave request across employees, newest first. */
 export const useAllLeaveRequests = () =>
   useQuery({
     queryKey: [QueryKeys.LEAVE_REQUESTS],
@@ -42,7 +41,6 @@ const fetchAllMedicalClaims = authQuery(async ({ supabase }) => {
   return data.map((row) => toMedicalClaim(row, row.employees?.full_name ?? ''));
 });
 
-/** Admin view: every medical claim across employees, newest first. */
 export const useAllMedicalClaims = () =>
   useQuery({
     queryKey: [QueryKeys.MEDICAL_CLAIMS],
@@ -63,7 +61,6 @@ const fetchAllOvertimeLogs = authQuery(async ({ supabase }) => {
   return data.map((row) => toOvertimeLog(row, row.employees?.full_name ?? ''));
 });
 
-/** Admin view: every overtime log across employees, newest first. */
 export const useAllOvertimeLogs = () =>
   useQuery({
     queryKey: [QueryKeys.OVERTIME_LOGS],

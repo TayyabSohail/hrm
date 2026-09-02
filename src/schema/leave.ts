@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { hrmConfig } from '@/constants/hrm-config';
 import { getZodEnum } from '@/schema/common';
 
-/** Shared leave-type enum, aligned to the `leave_type` DB enum. */
 export const leaveTypeEnum = getZodEnum([
   'paid',
   'sick',
@@ -11,22 +10,12 @@ export const leaveTypeEnum = getZodEnum([
   'half_day',
 ] as const);
 
-/** True when `value` (a 'YYYY-MM-DD' date) is today or later. Compared as
- *  date-only strings in the runtime's local timezone — a soft "not in the past"
- *  guard that runs on both the client (form) and the server (action), so it
- *  avoids Date-object parsing quirks. */
 const isTodayOrLater = (value: string): boolean => {
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   return value >= today;
 };
 
-/**
- * Employee-submitted leave request. Half Day pins days to 0.5 and all types are
- * constrained to 0.5-day increments (1.3 fails, 2.5 passes). `startDate` cannot
- * be in the past. The action forces `status = 'pending'` and re-derives
- * `num_days` server-side, so this schema is the client-side guard only.
- */
 export const createLeaveRequestSchema = z
   .object({
     type: leaveTypeEnum,
@@ -55,10 +44,6 @@ export const createLeaveRequestSchema = z
 
 export type LeaveRequestInput = z.infer<typeof createLeaveRequestSchema>;
 
-/**
- * Admin decision on a pending request. A rejection must carry a reason — it is
- * stored on the row, emailed to the employee, and shown in their history.
- */
 export const reviewLeaveSchema = z
   .object({
     id: z.string().uuid(),

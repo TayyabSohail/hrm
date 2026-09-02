@@ -11,14 +11,6 @@ type SendPasswordResetEmailInput = {
   resetUrl: string;
 };
 
-/**
- * Sends the password-recovery email through Resend. Mirrors `sendInviteEmail`:
- * Supabase's own mailer only supports its implicit-hash link flow, so we mint
- * the recovery link ourselves (`generateLink` in `requestPasswordReset`) and
- * deliver our branded React Email template (`@/emails/reset-password-email`)
- * pointing at `/auth/reset-password`. Throws on a Resend error so the caller
- * can decide whether to surface or swallow it.
- */
 export async function sendPasswordResetEmail({
   to,
   fullName,

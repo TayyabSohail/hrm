@@ -9,7 +9,6 @@ import { QueryKeys } from '@/constants/query-keys';
 import { MedicalClaim } from '@/types/hrm';
 import { type Tables } from '@/types/supabase';
 
-/** Private bucket holding claim proof files at `<uid>/<claimId>/<file>`. */
 export const MEDICAL_PROOFS_BUCKET = 'medical-proofs';
 const SIGNED_URL_TTL_SECONDS = 60 * 60; // 1h — long enough to view a preview
 
@@ -19,10 +18,6 @@ type MedicalClaimRow = Tables<'medical_claims'> & {
     | null;
 };
 
-/** Map a `medical_claims` row (+ its joined files) onto the `MedicalClaim`
- *  domain type. `proofFiles` carries the storage paths; the UI mints signed URLs
- *  from them on demand (see `useMedicalProofUrls`). The admin queue passes the
- *  joined employee name; self reads leave it '' (not rendered there). */
 export function toMedicalClaim(
   row: MedicalClaimRow,
   employeeName = '',
@@ -69,15 +64,10 @@ export const useMedicalClaims = (employeeId?: string) =>
   });
 
 export type MedicalBalanceResult = {
-  /** Tenure-based accrual, capped (PKR). */
   accrued: number;
-  /** Sum of approved claims (PKR). */
   spent: number;
-  /** accrued − spent, floored at 0 — the claimable amount. */
   available: number;
-  /** Resolved cap — the per-employee override, else the global setting (PKR). */
   cap: number;
-  /** Resolved monthly accrual — override, else global setting (PKR). */
   monthlyAccrual: number;
 };
 
@@ -113,10 +103,6 @@ export const useMedicalBalance = (employeeId?: string) =>
 
 export type MedicalProofFile = { path: string; url: string; name: string };
 
-/** Short-lived signed URLs for a claim's proof files. Reads directly from the
- *  `medical-proofs` bucket, so the medproofs_own / medproofs_admin storage RLS
- *  gates access — an owner sees their own, an admin sees any. Names strip the
- *  upload-time `<index>-` prefix (added to keep same-named files distinct). */
 export const useMedicalProofUrls = (paths: string[]) =>
   useQuery({
     queryKey: [QueryKeys.MEDICAL_PROOF_URLS, paths],

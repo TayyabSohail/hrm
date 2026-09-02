@@ -24,8 +24,6 @@ const fetchMyProfile = authQuery<undefined, Employee | null>(
   },
 );
 
-/** The signed-in employee's full profile — contact, bank, socials, and the
- *  read-only employment details (self, via RLS). */
 export const useMyProfile = () =>
   useQuery({
     queryKey: [QueryKeys.MY_PROFILE],

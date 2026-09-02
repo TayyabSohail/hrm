@@ -15,11 +15,6 @@ const fetchFxRates = async (base: string) => {
   return fxRatesResponseSchema.parse(await response.json());
 };
 
-/**
- * Live exchange rates from `base` to every other currency. Display-only: the
- * amount actually paid is always the frozen PKR payslip total, so a stale or
- * failed rate can never change what an employee receives.
- */
 export const useFxRates = (base: string = appConfig.defaultCurrency) =>
   useQuery({
     queryKey: [QueryKeys.FX_RATES, base],

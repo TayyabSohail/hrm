@@ -6,7 +6,6 @@ import {
   phonesAreDistinct,
 } from '@/schema/common';
 
-/** UUID identifying the target employee for an admin write. */
 export const employeeIdField = z.string().uuid();
 export const employeeIdSchema = z.object({ employeeId: employeeIdField });
 
@@ -25,14 +24,6 @@ export const inviteEmployeeSchema = z.object({
 
 export type InviteEmployeeInput = z.infer<typeof inviteEmployeeSchema>;
 
-/** An optional per-employee allowance override (leave pool / medical accrual /
- *  medical cap). A blank field — RHF's empty-input value — means "inherit the
- *  global setting" and resolves to `null`; a typed number, including `0`, is a
- *  real override. `z.coerce.number()` on its own turns `''` into `0` (a silent
- *  override to zero), so the empty case is matched and mapped to null *before*
- *  coercion. Kept independently optional (no cap ≥ accrual cross-field refine),
- *  mirroring the partial-update settings action — the balance math is safe when
- *  cap < accrual. */
 const allowanceOverride = (unit: string, max?: number) => {
   let value = z.coerce
     .number({ invalid_type_error: `Enter a whole number of ${unit}` })
@@ -104,18 +95,12 @@ export const contactInfoSchema = contactInfoObject.refine(
 
 export type ContactInfoInput = z.infer<typeof contactInfoSchema>;
 
-/** Admin edit of an employee's contact fields — the contact object plus the
- *  target employeeId, re-refined for the distinct-phones rule. */
 export const contactInfoWithIdSchema = contactInfoObject
   .extend({ employeeId: employeeIdField })
   .refine(phonesAreDistinct, distinctPhonesOptions);
 
 export type ContactInfoWithIdInput = z.infer<typeof contactInfoWithIdSchema>;
 
-/** Identity fields on the employees row. Same three columns onboarding's
- *  `savePersonal` writes (name / DOB / CNIC), minus the contact fields that
- *  have their own card. Admins self-edit these on their own profile — an admin
- *  has no admin above them to manage their record. */
 export const personalDetailsSchema = z.object({
   fullName: z.string().min(2, 'Enter your full name'),
   dateOfBirth: z.string().min(1, 'Enter your date of birth'),
